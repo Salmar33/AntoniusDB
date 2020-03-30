@@ -191,47 +191,47 @@ void DBInterface::UpdateRecordValue(QString table, QString column, QString updat
     }
 }
 
-/**
- * @brief DBInterface::UpdateRecordForeignKey Updates a single value of some record in the database
- * It looks up the key value from \param foreignValue in the table \param foreignTable and column \param foreignColumn, where we assume that the key value is the first column of the table.
- * This key value of this foreign table is then used to update the record in \param tableName at the column \param columnName and \param ID
- * If no corresponding entry is found in the foreign table, this method will do nothing.
- * @details It is assumed that the primary key of the foreign table is on position ID_POS
- * @param table Name of the table for which a record is updated
- * @param column The column to be updated
- * @param foreignValue The value of the entry (specified by columnName and ID)
- * @param ID The record's ID, which is to be updated
- * @param foreignTable The table to get the new key value from
- * @param foreignColumn The column of the foreign value
- */
-void DBInterface::UpdateRecordForeignKey(QString table, QString column, QString foreignValue, unsigned ID, QString foreignTable, QString foreignColumn)
-{
-    QSqlQuery sqlQuery(database);
-    QString sqlString("SELECT * FROM `" + foreignTable + "` WHERE `" + foreignColumn + "` = '" + foreignValue + "'");
-
-    if(foreignValue.isNull() || foreignValue.isEmpty())
-    {
-        //set the key value to 0 if the entry should be cleared
-        UpdateRecordValue(table, column, QString::number(0), ID);
-    }
-    else
-    {
-        if(sqlQuery.exec(sqlString) == false)
-        {
-            qInfo() << "sqlString:" << sqlString;
-            errorMan.BailOut("Error with sqlQuery.exec()", __FILE__, __LINE__, FAILURE);
-        }
-        if(sqlQuery.next())
-        {
-            UpdateRecordValue(table, column, sqlQuery.value(ID_POS).toString(), ID);
-        }
-        //if the foreign value does not exist in the table
-        else
-        {
-            //do nothing
-        }
-    }
-}
+///**
+// * @brief DBInterface::UpdateRecordForeignKey Updates a single value of some record in the database
+// * It looks up the key value from \param foreignValue in the table \param foreignTable and column \param foreignColumn, where we assume that the key value is the first column of the table.
+// * This key value of this foreign table is then used to update the record in \param tableName at the column \param columnName and \param ID
+// * If no corresponding entry is found in the foreign table, this method will do nothing.
+// * @details It is assumed that the primary key of the foreign table is on position ID_POS
+// * @param table Name of the table for which a record is updated
+// * @param column The column to be updated
+// * @param foreignValue The value of the entry (specified by columnName and ID)
+// * @param ID The record's ID, which is to be updated
+// * @param foreignTable The table to get the new key value from
+// * @param foreignColumn The column of the foreign value
+// */
+//void DBInterface::UpdateRecordForeignKey(QString table, QString column, QString foreignValue, unsigned ID, QString foreignTable, QString foreignColumn)
+//{
+//    QSqlQuery sqlQuery(database);
+//    QString sqlString("SELECT * FROM `" + foreignTable + "` WHERE `" + foreignColumn + "` = '" + foreignValue + "'");
+//
+//    if(foreignValue.isNull() || foreignValue.isEmpty())
+//    {
+//        //set the key value to 0 if the entry should be cleared
+//        UpdateRecordValue(table, column, QString::number(0), ID);
+//    }
+//    else
+//    {
+//        if(sqlQuery.exec(sqlString) == false)
+//        {
+//            qInfo() << "sqlString:" << sqlString;
+//            errorMan.BailOut("Error with sqlQuery.exec()", __FILE__, __LINE__, FAILURE);
+//        }
+//        if(sqlQuery.next())
+//        {
+//            UpdateRecordValue(table, column, sqlQuery.value(ID_POS).toString(), ID);
+//        }
+//        //if the foreign value does not exist in the table
+//        else
+//        {
+//            //do nothing
+//        }
+//    }
+//}
 
 /**
  * @brief DBInterface::Contains Checks whether in the database the table \c table contains an element, whose entry in \c column equals \c content
