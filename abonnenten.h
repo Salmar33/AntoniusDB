@@ -84,6 +84,7 @@ private slots:
     void on_spinAntoniusAnzahl_editingFinished();
     void on_dateErstelltAm_dateTimeChanged(const QDateTime &dateTime);
     void on_dateStatusGesetzt_dateTimeChanged(const QDateTime &dateTime);
+    void on_buttonBuchungHinzu_clicked();
 };
 
 #endif // ABONNENTENINLAND_H

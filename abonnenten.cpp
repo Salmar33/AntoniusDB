@@ -923,3 +923,13 @@ void AbonnentenInland::SetActiveID(unsigned int newActiveID)
 {
     this->activeID = newActiveID;
 }
+
+/**
+ * @brief AbonnentenInland::on_buttonBuchungHinzu_clicked Slot function for when the "Buchung hinzufügen" button is clicked
+ */
+void AbonnentenInland::on_buttonBuchungHinzu_clicked()
+{
+    BuchungHinzu buchungDialog(activeID, dbInterface, this);
+    buchungDialog.exec();
+    LoadActiveRecord();
+}
