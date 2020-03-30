@@ -33,12 +33,14 @@ public:
     QSqlDatabase& GetDatabase(void);
     void ConnectToDatabase(QString password);
     QString GetNameFromID(QString table, QString ID);
-    void SetElemComboBox(QComboBox *comboBox, unsigned int currentElemID);
+    unsigned int GetIDFromValue(QString table, QString valueColumn, QString value);
+    void SetElemComboBoxTabModel(QComboBox *comboBox, unsigned int currentElemID);
+    void SetElemComboBoxRelTabModel(QComboBox *comboBox, unsigned int currentElemID, unsigned int IDPos);
     bool AddToComboBoxPromptUpdateRecord(QComboBox *comboBox, QString table, QString column, unsigned int currentID, QWidget *parentWidget);
     void AddBuchung(unsigned int remitterID, QDate date, double value);
     //void UpdateRecordForeignKey(QString table, QString column, QString foreignValue, unsigned ID, QString foreignTable, QString foreignColumn);
     void UpdateRecordValue(QString tableName, QString columnName, QString updateValue, unsigned ID);
     bool Contains(QString table, QString column, QString content);
-    void AddJuncRecord(QString juncTable, QString thisJuncColumnID, QString otherJuncColumnID, unsigned int newID, unsigned int otherCurrentID);
+    void AddJuncRecord(QString juncTable, QString thisJuncColumnID, QString otherJuncColumnID, unsigned int thisID, unsigned int otherCurrentID);
 };
 #endif // DBINTERFACE_H

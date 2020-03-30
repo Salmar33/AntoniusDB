@@ -363,16 +363,18 @@ void AbonnentenInland::LoadActiveRecord()
     prChange = true;
     //reload the content of the comboboxes and set their current value
     anredeModel->select();
-    dbInterface->SetElemComboBox(ui->comboAnrede, sqlQuery.value(ABONNENTEN_ANREDE_POS).toUInt());
+    dbInterface->SetElemComboBoxTabModel(ui->comboAnrede, sqlQuery.value(ABONNENTEN_ANREDE_POS).toUInt());
     amtstitelModel->select();
-    dbInterface->SetElemComboBox(ui->comboAmtstitel, sqlQuery.value(ABONNENTEN_AMTSTITEL_POS).toUInt());
+    dbInterface->SetElemComboBoxTabModel(ui->comboAmtstitel, sqlQuery.value(ABONNENTEN_AMTSTITEL_POS).toUInt());
     plzModel->select();
-    dbInterface->SetElemComboBox(ui->comboPLZ, sqlQuery.value(ABONNENTEN_PLZAUSTRIA_POS).toUInt());
+    dbInterface->SetElemComboBoxTabModel(ui->comboPLZ, sqlQuery.value(ABONNENTEN_PLZAUSTRIA_POS).toUInt());
     statusModel->select();
-    dbInterface->SetElemComboBox(ui->comboStatus, sqlQuery.value(ABONNENTEN_STATUS_POS).toUInt());
+    dbInterface->SetElemComboBoxTabModel(ui->comboStatus, sqlQuery.value(ABONNENTEN_STATUS_POS).toUInt());
     ortModel->setFilter(QString("`" + PLZ_ORT_JUNC_PLZ_ID + "` = '" + sqlQuery.value(ABONNENTEN_PLZAUSTRIA_POS).toString() + "'"));
     ortModel->select();
-    dbInterface->SetElemComboBox(ui->comboOrt, sqlQuery.value(ABONNENTEN_ORTAUSTRIA_POS).toUInt());
+    //ortModel corresponds to a QSqlRelationalTableModel (internally a join of the tables is happening), where the ID of the corresponding "Ort" is
+    //at the 3rd position --> index 2
+    dbInterface->SetElemComboBoxRelTabModel(ui->comboOrt, sqlQuery.value(ABONNENTEN_ORTAUSTRIA_POS).toUInt(), 2);
     if(!sqlQuery.value(ABONNENTEN_ERSTELLTAM_POS).toDate().isValid() || sqlQuery.value(ABONNENTEN_ERSTELLTAM_POS).toString().compare(ZERO_DATETIME_STRING) == 0)
         ui->dateErstelltAm->setDateTime(ui->dateErstelltAm->minimumDateTime());
     else
@@ -766,7 +768,7 @@ bool AbonnentenInland::HandleComboBoxManipulationTableModel(QComboBox *comboBox,
             else
             {
                 //reload the "old" value in the combo box
-                dbInterface->SetElemComboBox(comboBox, currentID);
+                dbInterface->SetElemComboBoxTabModel(comboBox, currentID);
                 returnVal = false;
             }
         }
@@ -856,18 +858,7 @@ void AbonnentenInland::HandleComboBoxManipulationRelationalTableModel(QComboBox 
                     QMessageBox::StandardButton messageBoxButton = QMessageBox::question(this, QString("New association"), QString("Do you want to permanently associate '" + comboBox->currentText() + "' with the current PLZ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
                     if(messageBoxButton == QMessageBox::Yes)
                     {
-                        QSqlQuery query;
-                        QString sqlString("SELECT `ID` FROM `" + comboBoxTable + "` WHERE " + "`" + comboBoxColumnName + "` LIKE '" + comboBox->currentText() + "'");
-                        if(query.exec(sqlString) == false)
-                        {
-                            qInfo() << "sqlString: " << sqlString;
-                            errorMan.BailOut("Error with query.exec()", __FILE__, __LINE__, FAILURE);
-                        }
-                        if(query.next() == false)
-                        {
-                            errorMan.BailOut("Error with query.next()", __FILE__, __LINE__, FAILURE);
-                        }
-                        unsigned int newID = query.value(0).toUInt();
+                        unsigned int newID = dbInterface->GetIDFromValue(comboBoxTable, comboBoxColumnName, comboBox->currentText());
                         dbInterface->AddJuncRecord(juncTable, thisJuncColumnID, otherJuncColumnID, newID, otherCurrentID);
                         dbInterface->UpdateRecordValue(tableMain,columnMain, QString::number(newID), activeID);
                         SetUpdateDateTimeLastChangeToCurrentDateTime();
@@ -876,20 +867,20 @@ void AbonnentenInland::HandleComboBoxManipulationRelationalTableModel(QComboBox 
                     else
                     {
                         //reload the "old" value in the combo box
-                        dbInterface->SetElemComboBox(comboBox, currentID);
+                        dbInterface->SetElemComboBoxTabModel(comboBox, currentID);
                     }
                 }
                 else
                 {
                     //reload the "old" value in the combo box
-                    dbInterface->SetElemComboBox(comboBox, currentID);
+                    dbInterface->SetElemComboBoxTabModel(comboBox, currentID);
                 }
 
             }
             else
             {
                 //reload the "old" value in the combo box
-                dbInterface->SetElemComboBox(comboBox, currentID);
+                dbInterface->SetElemComboBoxTabModel(comboBox, currentID);
             }
         }
         else

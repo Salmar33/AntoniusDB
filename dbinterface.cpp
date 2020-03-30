@@ -76,11 +76,34 @@ QString DBInterface::GetNameFromID(QString table, QString ID)
 }
 
 /**
- * @brief DBInterface::SetComboBox Sets the actively displayed value of a combobox that has a QSqlTableModel in the database \c database
+ * @brief DBInterface::GetIDFromName Returns the ID (primary key field) from an entry in \c table with a matching \c value
+ * @param table The table where to look for the ID
+ * @param valueColumn The name of the column, where the \c value is stored
+ * @param value Value for which a matching record is searched for in \c table
+ * @return Returns the ID of a record with the value \c value in its column \c valueColumn
+ */
+unsigned int DBInterface::GetIDFromValue(QString table, QString valueColumn, QString value)
+{
+    QSqlQuery query;
+    QString sqlString("SELECT `ID` FROM `" + table + "` WHERE " + "`" + valueColumn + "` LIKE '" + value + "'");
+    if(query.exec(sqlString) == false)
+    {
+        qInfo() << "sqlString: " << sqlString;
+        errorMan.BailOut("Error with query.exec()", __FILE__, __LINE__, FAILURE);
+    }
+    if(query.next() == false)
+    {
+        errorMan.BailOut("Error with query.next()", __FILE__, __LINE__, FAILURE);
+    }
+    return query.value(0).toUInt();
+}
+
+/**
+ * @brief DBInterface::SetComboBoxTabModel Sets the actively displayed value of a combobox that has a QSqlTableModel in the database \c database
  * @param comboBox The combobox whose active value should be set
  * @param currentElemID ID from the table in the database corresponding to the entry that should be currently displayed in the combobox
  */
-void DBInterface::SetElemComboBox(QComboBox *comboBox, unsigned int currentElemID)
+void DBInterface::SetElemComboBoxTabModel(QComboBox *comboBox, unsigned int currentElemID)
 {
     static_cast<QSqlTableModel*>(comboBox->model())->select();
     //set the current value of the combobox
@@ -89,6 +112,33 @@ void DBInterface::SetElemComboBox(QComboBox *comboBox, unsigned int currentElemI
     for(int index = 0; index < comboBox->model()->rowCount(); index++)
     {
         tempID = static_cast<QSqlTableModel*>(comboBox->model())->record(index).value(ID_POS).toUInt();
+        if(tempID == currentElemID)
+        {
+            comboBox->setCurrentIndex(index);
+            elementFound = true;
+            break;
+        }
+    }
+    //if no element with matching ID was found, clear the combo box's edit line
+    if(!elementFound)
+        comboBox->clearEditText();
+}
+
+/**
+ * @brief DBInterface::SetComboBoxCustomID Sets the actively displayed value of a combobox that has a QSqlRelationalTableModel in the database \c database
+ * @param comboBox The combobox whose active value should be set
+ * @param currentElemID ID from the table in the database corresponding to the entry that should be currently displayed in the combobox
+ * @param IDPos The indexed position (beginning at 0) of the ID field in the combo boxes model
+ */
+void DBInterface::SetElemComboBoxRelTabModel(QComboBox *comboBox, unsigned int currentElemID, unsigned int IDPos)
+{
+    static_cast<QSqlRelationalTableModel*>(comboBox->model())->select();
+    //set the current value of the combobox
+    bool elementFound = false;
+    unsigned int tempID = 0;
+    for(int index = 0; index < comboBox->model()->rowCount(); index++)
+    {
+        tempID = static_cast<QSqlRelationalTableModel*>(comboBox->model())->record(index).value(IDPos).toUInt();
         if(tempID == currentElemID)
         {
             comboBox->setCurrentIndex(index);
@@ -141,13 +191,13 @@ bool DBInterface::AddToComboBoxPromptUpdateRecord(QComboBox *comboBox, QString t
             qInfo() << "sqlString: " << sqlString;
             errorMan.BailOut("sqlQuery.next() == false - meaning the query returns no result", __FILE__, __LINE__, FAILURE);
         }
-        SetElemComboBox(comboBox, sqlQuery.value(0).toUInt());
+        SetElemComboBoxTabModel(comboBox, sqlQuery.value(0).toUInt());
         return true;
     }
     else
     {
         //setup the combobox and set its current value according to \c currentID
-        SetElemComboBox(comboBox, currentID);
+        SetElemComboBoxTabModel(comboBox, currentID);
         return false;
     }
 }
@@ -258,13 +308,13 @@ bool DBInterface::Contains(QString table, QString column, QString content)
  * @param juncTable Name of the junction table to which the record should be added
  * @param thisJuncColumnID Name of junction table's first party of primary key - corresponds to \c newID
  * @param otherJuncColumnID Name of junction table's other part of primary key - corresponds to \c otherCurrentID
- * @param newID Primary key value of new record for column \c thisJuncColumnID
+ * @param thisID Primary key value of new record for column \c thisJuncColumnID
  * @param otherCurrentID Primary key value of new record for column \c otherJuncColumnID
  */
-void DBInterface::AddJuncRecord(QString juncTable, QString thisJuncColumnID, QString otherJuncColumnID, unsigned int newID, unsigned int otherCurrentID)
+void DBInterface::AddJuncRecord(QString juncTable, QString thisJuncColumnID, QString otherJuncColumnID, unsigned int thisID, unsigned int otherCurrentID)
 {
     QSqlQuery sqlQuery(database);
-    QString sqlString("INSERT INTO `" + juncTable + "` (`" + thisJuncColumnID + "`, `" + otherJuncColumnID + "`) VALUES ('" + QString::number(newID) + "', '" + QString::number(otherCurrentID) + "')");
+    QString sqlString("INSERT INTO `" + juncTable + "` (`" + thisJuncColumnID + "`, `" + otherJuncColumnID + "`) VALUES ('" + QString::number(thisID) + "', '" + QString::number(otherCurrentID) + "')");
     if(sqlQuery.exec(sqlString) == false)
     {
         qInfo() << "sqlString: " << sqlString;
