@@ -328,49 +328,6 @@ void AbonnentenInlandSuche::AddRow(TableRowData tableRowData, bool update)
 }
 
 /**
- * @brief AbonnentenInlandSuche::AddRow Adds a test row
- */
-void AbonnentenInlandSuche::AddRowTest(void)
-{
-    TableRowData tableRowData(
-                QString("0"),
-                QString("G"),
-                QString("Herrn"),
-                QString("Prof."),
-                QString("Dr."),
-                QString("PhD"),
-                QString("Max"),
-                QString("Mustermann"),
-                QString("Hoola Hoop Corp."),
-                QString("Gangsta Street 69"),
-                QString("1234"),
-                QString("Wien"),
-                QString("1"),
-                QString("Wants cookies")
-                );
-    AddRow(tableRowData, true);
-}
-
-/**
- * @brief Just for testing
- */
-void AbonnentenInlandSuche::on_pushButton_clicked()
-{
-    for(int z = 0; z < 10000; z++)
-    {
-        AddRowTest();
-    }
-}
-
-/**
- * @brief Just for testing
- */
-void AbonnentenInlandSuche::on_pushButton_2_clicked()
-{
-    ClearTable();
-}
-
-/**
  * @brief AbonnentenInlandSuche::FiltersChanged Slot function that is called, whenever a filter (line edit or combobox) is changed
  * @param text The new text that changed
  */
@@ -651,4 +608,12 @@ void AbonnentenInlandSuche::on_tableWidget_cellClicked(int row, int column)
         abonnentenInlandWidget->LoadActiveRecord();
         static_cast<QTabWidget*>(parent)->setCurrentIndex(ABONNENTEN_TAB);
     }
+}
+
+/**
+ * @brief AbonnentenInlandSuche::on_exportButton_clicked Slot function for when the export button is clicked
+ */
+void AbonnentenInlandSuche::on_exportButton_clicked()
+{
+    //TODO
 }

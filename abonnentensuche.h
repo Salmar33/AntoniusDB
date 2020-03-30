@@ -12,6 +12,7 @@
 #include <QSqlError>
 #include <QDebug>
 #include <QSqlDatabase>
+#include <QFileDialog>
 #include "columnwidthposx.h"
 #include "ErrorManagement/ErrorManagement.h"
 #include "defaultmeasures.h"
@@ -103,12 +104,12 @@ public:
     void AddRowTest(void);
 
 private slots:
-    void on_pushButton_clicked();
-    void on_pushButton_2_clicked();
     void FiltersChanged(const QString& text);
     void on_checkBoxSortByChangeDate_stateChanged(int arg1);
 
     void on_tableWidget_cellClicked(int row, int column);
+
+    void on_exportButton_clicked();
 
 private:
     Ui::AbonnentenInlandSuche *ui;
