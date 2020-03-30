@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AntoniusDBGUITab</class>
+ <widget class="QTabWidget" name="AntoniusDBGUITab">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1600</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>TabWidget</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(238, 245, 255, 255), stop:1 rgba(255, 255, 255, 255));</string>
+  </property>
+  <property name="currentIndex">
+   <number>-1</number>
+  </property>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
