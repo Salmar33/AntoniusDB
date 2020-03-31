@@ -41,6 +41,7 @@ extern ErrorManagement errorMan;
 #define ANTONIUSANZAHL_WIDTH		100
 #define ZUSATZINFO_WIDTH			80
 
+
 namespace Ui {
 class AbonnentenInlandSuche;
 }
@@ -114,13 +115,16 @@ private slots:
 private:
     Ui::AbonnentenInlandSuche *ui;
     QWidget *parent;
+    bool prFilterChange;
 
     QString BuildQueryString(void);
-    void ComboboxBuildQueryString(QString& sqlString, QString tableName, QString comboboxColumnName, QString comboboxText, QString columnName, bool& firstWhereClause);
-    void BuildQueryStringPart(QString& sqlString, bool& firstWhereClause, QString columnName, QString filterContent);
+    void ComboboxBuildQueryString(QString& sqlString, QComboBox *comboBox, QString columnName, bool& firstWhereClause);
+    void BuildQueryStringPart(QString& sqlString, bool& firstWhereClause, QString columnName, QString filterContent, bool strictComparison);
     void ResetFilters(void);
     void ExecuteQueryUpdateTable(QString sqlString);
     void UpdateLCDNum(void);
+    void RefreshComboboxModels(void);
+    void RefreshComboBoxModel(QComboBox *comboBox);
 
     QString GetStatusName(QString statusID);
     QString GetAnredeName(QString anredeID);
@@ -132,18 +136,22 @@ private:
     DBInterface *dbInterface;
 
     ModQLineEdit *IDFilter;
-    ModQLineEdit *TitelVorFilter;
-    ModQLineEdit *TitelNachFilter;
-    ModQLineEdit *VornameFilter;
-    ModQLineEdit *NachnameFilter;
-    ModQLineEdit *OrganisationFilter;
-    ModQLineEdit *StrasseFilter;
+    ModQLineEdit *titelVorFilter;
+    ModQLineEdit *titelNachFilter;
+    ModQLineEdit *vornameFilter;
+    ModQLineEdit *nachnameFilter;
+    ModQLineEdit *organisationFilter;
+    ModQLineEdit *strasseFilter;
     ModQLineEdit *PLZFilter;
-    ModQLineEdit *OrtFilter;
+    ModQLineEdit *ortFilter;
 
-    ModQComboBox *StatusFilter;
-    ModQComboBox *AnredeFilter;
-    ModQComboBox *AmtstitelFilter;
+    ModQComboBox *statusFilter;
+    ModQComboBox *anredeFilter;
+    ModQComboBox *amtstitelFilter;
+
+    QSqlTableModel *statusModel;
+    QSqlTableModel *anredeModel;
+    QSqlTableModel *amtstitelModel;
 
     QStringList tableHeaderList;
 };

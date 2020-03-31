@@ -11,52 +11,59 @@ AbonnentenInland::AbonnentenInland(DBInterface *dbInterface, QWidget *parent) :
     this->dbInterface = dbInterface;
 
     //set up the combo boxes with their respective SQL table models
-    amtstitelModel = new QSqlTableModel(this, this->dbInterface->GetDatabase());
-    amtstitelModel->setTable(AMTSTITEL_TABLE);
-    ui->comboAmtstitel->setModel(amtstitelModel);
-    ui->comboAmtstitel->setModelColumn(AMTSTITEL_AMTSTITEL_POS);
-    static_cast<QSqlTableModel*>(ui->comboAmtstitel->model())->setSort(AMTSTITEL_AMTSTITEL_POS, Qt::AscendingOrder);
-    static_cast<QSqlTableModel*>(ui->comboAmtstitel->model())->select();
+    try
+    {
+        amtstitelModel = new QSqlTableModel(this, this->dbInterface->GetDatabase());
+        amtstitelModel->setTable(AMTSTITEL_TABLE);
+        ui->comboAmtstitel->setModel(amtstitelModel);
+        ui->comboAmtstitel->setModelColumn(AMTSTITEL_AMTSTITEL_POS);
+        static_cast<QSqlTableModel*>(ui->comboAmtstitel->model())->setSort(AMTSTITEL_AMTSTITEL_POS, Qt::AscendingOrder);
+        static_cast<QSqlTableModel*>(ui->comboAmtstitel->model())->select();
 
-    anredeModel = new QSqlTableModel(this, this->dbInterface->GetDatabase());
-    anredeModel->setTable(ANREDE_TABLE);
-    ui->comboAnrede->setModel(anredeModel);
-    ui->comboAnrede->setModelColumn(ANREDE_ANREDE_POS);
-    static_cast<QSqlTableModel*>(ui->comboAnrede->model())->select();
+        anredeModel = new QSqlTableModel(this, this->dbInterface->GetDatabase());
+        anredeModel->setTable(ANREDE_TABLE);
+        ui->comboAnrede->setModel(anredeModel);
+        ui->comboAnrede->setModelColumn(ANREDE_ANREDE_POS);
+        static_cast<QSqlTableModel*>(ui->comboAnrede->model())->select();
 
-    ortModel = new QSqlRelationalTableModel(this, this->dbInterface->GetDatabase());
-    ortModel->setTable(PLZ_ORT_JUNC_TABLE);
-    ortModel->setRelation(PLZ_ORT_JUNC_ORT_ID_POS, QSqlRelation(ORT_TABLE, ORT_ID, ORT_ORT + ", " + ORT_ID + " as " + ORT_ID));
-    ui->comboOrt->setModel(ortModel);
-    ui->comboOrt->setModelColumn(PLZ_ORT_JUNC_ORT_ID_POS);
-    static_cast<QSqlRelationalTableModel*>(ui->comboOrt->model())->select();
+        ortModel = new QSqlRelationalTableModel(this, this->dbInterface->GetDatabase());
+        ortModel->setTable(PLZ_ORT_JUNC_TABLE);
+        ortModel->setRelation(PLZ_ORT_JUNC_ORT_ID_POS, QSqlRelation(ORT_TABLE, ORT_ID, ORT_ORT + ", " + ORT_ID + " as " + ORT_ID));
+        ui->comboOrt->setModel(ortModel);
+        ui->comboOrt->setModelColumn(PLZ_ORT_JUNC_ORT_ID_POS);
+        static_cast<QSqlRelationalTableModel*>(ui->comboOrt->model())->select();
 
-    plzModel = new QSqlTableModel(this, this->dbInterface->GetDatabase());
-    plzModel->setTable(PLZ_TABLE);
-    ui->comboPLZ->setModel(plzModel);
-    ui->comboPLZ->setModelColumn(PLZ_PLZ_POS);
-    static_cast<QSqlTableModel*>(ui->comboPLZ->model())->select();
+        plzModel = new QSqlTableModel(this, this->dbInterface->GetDatabase());
+        plzModel->setTable(PLZ_TABLE);
+        ui->comboPLZ->setModel(plzModel);
+        ui->comboPLZ->setModelColumn(PLZ_PLZ_POS);
+        static_cast<QSqlTableModel*>(ui->comboPLZ->model())->select();
 
-    statusModel = new QSqlTableModel(this, this->dbInterface->GetDatabase());
-    statusModel->setTable(STATUS_TABLE);
-    ui->comboStatus->setModel(statusModel);
-    ui->comboStatus->setModelColumn(STATUS_STATUS_POS);
-    static_cast<QSqlTableModel*>(ui->comboStatus->model())->select();
+        statusModel = new QSqlTableModel(this, this->dbInterface->GetDatabase());
+        statusModel->setTable(STATUS_TABLE);
+        ui->comboStatus->setModel(statusModel);
+        ui->comboStatus->setModelColumn(STATUS_STATUS_POS);
+        static_cast<QSqlTableModel*>(ui->comboStatus->model())->select();
 
-    buchungenModel = new QSqlTableModel(this, this->dbInterface->GetDatabase());
-    buchungenModel->setTable(BUCHUNGEN_TABLE);
-    buchungenModel->setSort(BUCHUNGEN_DATUM_POS, Qt::DescendingOrder);
-    ui->tableBuchungen->setModel(buchungenModel);
-    ui->tableBuchungen->setColumnHidden(BUCHUNGEN_UEBERWEISER_ID_POS, true);
-    ui->tableBuchungen->setColumnHidden(BUCHUNGEN_BUCHUNGSNUMMER_POS, true);
-    ui->tableBuchungen->setColumnHidden(BUCHUNGEN_IBAN_POS, true);
-    ui->tableBuchungen->setColumnHidden(BUCHUNGEN_BIC_POS, true);
-    ui->tableBuchungen->setColumnHidden(BUCHUNGEN_STATUS_POS, true);
-    ui->tableBuchungen->setColumnHidden(BUCHUNGEN_GEGKTO_POS, true);
-    ui->tableBuchungen->setColumnHidden(BUCHUNGEN_VERWENDUNGSZWECK_POS, true);
-    ui->tableBuchungen->setColumnHidden(BUCHUNGEN_EINGEHEND_POS, true);
-    ui->tableBuchungen->setColumnHidden(BUCHUNGEN_DANKBRIEF_POS, true);
-    ui->tableBuchungen->setColumnHidden(BUCHUNGEN_LETZTE_AENDERUNG_POS, true);
+        buchungenModel = new QSqlTableModel(this, this->dbInterface->GetDatabase());
+        buchungenModel->setTable(BUCHUNGEN_TABLE);
+        buchungenModel->setSort(BUCHUNGEN_DATUM_POS, Qt::DescendingOrder);
+        ui->tableBuchungen->setModel(buchungenModel);
+        ui->tableBuchungen->setColumnHidden(BUCHUNGEN_UEBERWEISER_ID_POS, true);
+        ui->tableBuchungen->setColumnHidden(BUCHUNGEN_BUCHUNGSNUMMER_POS, true);
+        ui->tableBuchungen->setColumnHidden(BUCHUNGEN_IBAN_POS, true);
+        ui->tableBuchungen->setColumnHidden(BUCHUNGEN_BIC_POS, true);
+        ui->tableBuchungen->setColumnHidden(BUCHUNGEN_STATUS_POS, true);
+        ui->tableBuchungen->setColumnHidden(BUCHUNGEN_GEGKTO_POS, true);
+        ui->tableBuchungen->setColumnHidden(BUCHUNGEN_VERWENDUNGSZWECK_POS, true);
+        ui->tableBuchungen->setColumnHidden(BUCHUNGEN_EINGEHEND_POS, true);
+        ui->tableBuchungen->setColumnHidden(BUCHUNGEN_DANKBRIEF_POS, true);
+        ui->tableBuchungen->setColumnHidden(BUCHUNGEN_LETZTE_AENDERUNG_POS, true);
+    }
+    catch(std::bad_alloc exception)
+    {
+        errorMan.BailOut("std::bad_alloc exception thrown", __FILE__, __LINE__, FAILURE);
+    }
 
     //set the special value texts for the date time fields (the text to display if the current value is equal to the minimum displayable value)
     ui->dateErstelltAm->setSpecialValueText(DATETIME_SPECIAL_VALUE);

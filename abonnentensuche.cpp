@@ -13,6 +13,7 @@ AbonnentenInlandSuche::AbonnentenInlandSuche(DBInterface *dbInterface, QWidget *
     this->dbInterface = dbInterface;
     this->parent = parent;
 
+    prFilterChange = false;
     /********** set the horizontal headers for the table **********/
     ui->tableWidget->setColumnCount(INLAND_SUCHE_COLUMN_COUNT);
 
@@ -80,60 +81,81 @@ AbonnentenInlandSuche::AbonnentenInlandSuche(DBInterface *dbInterface, QWidget *
         IDFilter->setFont(font);
         IDFilter->setFixedWidth(ID_WIDTH);
 
-        TitelVorFilter = new ModQLineEdit(this, this);
-        TitelVorFilter->move(QPoint(colWPosX.CalcPosX(QString("Titel vorgestellt")), FILTER_QLINEEDIT_Y));
-        TitelVorFilter->setFont(font);
-        TitelVorFilter->setFixedWidth(TITEL_VOR_WIDTH);
+        titelVorFilter = new ModQLineEdit(this, this);
+        titelVorFilter->move(QPoint(colWPosX.CalcPosX(QString("Titel vorgestellt")), FILTER_QLINEEDIT_Y));
+        titelVorFilter->setFont(font);
+        titelVorFilter->setFixedWidth(TITEL_VOR_WIDTH);
 
-        TitelNachFilter = new ModQLineEdit(this, this);
-        TitelNachFilter->move(QPoint(colWPosX.CalcPosX(QString("Titel nachgestellt")), FILTER_QLINEEDIT_Y));
-        TitelNachFilter->setFont(font);
-        TitelNachFilter->setFixedWidth(TITEL_NACH_WIDTH);
+        titelNachFilter = new ModQLineEdit(this, this);
+        titelNachFilter->move(QPoint(colWPosX.CalcPosX(QString("Titel nachgestellt")), FILTER_QLINEEDIT_Y));
+        titelNachFilter->setFont(font);
+        titelNachFilter->setFixedWidth(TITEL_NACH_WIDTH);
 
-        VornameFilter = new ModQLineEdit(this, this);
-        VornameFilter->move(QPoint(colWPosX.CalcPosX(QString("Vorname")), FILTER_QLINEEDIT_Y));
-        VornameFilter->setFont(font);
-        VornameFilter->setFixedWidth(VORNAME_WIDTH);
+        vornameFilter = new ModQLineEdit(this, this);
+        vornameFilter->move(QPoint(colWPosX.CalcPosX(QString("Vorname")), FILTER_QLINEEDIT_Y));
+        vornameFilter->setFont(font);
+        vornameFilter->setFixedWidth(VORNAME_WIDTH);
 
-        NachnameFilter = new ModQLineEdit(this, this);
-        NachnameFilter->move(QPoint(colWPosX.CalcPosX(QString("Nachname")), FILTER_QLINEEDIT_Y));
-        NachnameFilter->setFont(font);
-        NachnameFilter->setFixedWidth(NACHNAME_WIDTH);
+        nachnameFilter = new ModQLineEdit(this, this);
+        nachnameFilter->move(QPoint(colWPosX.CalcPosX(QString("Nachname")), FILTER_QLINEEDIT_Y));
+        nachnameFilter->setFont(font);
+        nachnameFilter->setFixedWidth(NACHNAME_WIDTH);
 
-        OrganisationFilter = new ModQLineEdit(this, this);
-        OrganisationFilter->move(QPoint(colWPosX.CalcPosX(QString("Organisation")), FILTER_QLINEEDIT_Y));
-        OrganisationFilter->setFont(font);
-        OrganisationFilter->setFixedWidth(ORGANISATION_WIDTH);
+        organisationFilter = new ModQLineEdit(this, this);
+        organisationFilter->move(QPoint(colWPosX.CalcPosX(QString("Organisation")), FILTER_QLINEEDIT_Y));
+        organisationFilter->setFont(font);
+        organisationFilter->setFixedWidth(ORGANISATION_WIDTH);
 
-        StrasseFilter = new ModQLineEdit(this, this);
-        StrasseFilter->move(QPoint(colWPosX.CalcPosX(QString("Straße")), FILTER_QLINEEDIT_Y));
-        StrasseFilter->setFont(font);
-        StrasseFilter->setFixedWidth(STRASSE_WIDTH);
+        strasseFilter = new ModQLineEdit(this, this);
+        strasseFilter->move(QPoint(colWPosX.CalcPosX(QString("Straße")), FILTER_QLINEEDIT_Y));
+        strasseFilter->setFont(font);
+        strasseFilter->setFixedWidth(STRASSE_WIDTH);
 
         PLZFilter = new ModQLineEdit(this, this);
         PLZFilter->move(QPoint(colWPosX.CalcPosX(QString("Plz")), FILTER_QLINEEDIT_Y));
         PLZFilter->setFont(font);
         PLZFilter->setFixedWidth(PLZ_WIDTH);
 
-        OrtFilter = new ModQLineEdit(this, this);
-        OrtFilter->move(QPoint(colWPosX.CalcPosX(QString("Ort")), FILTER_QLINEEDIT_Y));
-        OrtFilter->setFont(font);
-        OrtFilter->setFixedWidth(ORT_WIDTH);
+        ortFilter = new ModQLineEdit(this, this);
+        ortFilter->move(QPoint(colWPosX.CalcPosX(QString("Ort")), FILTER_QLINEEDIT_Y));
+        ortFilter->setFont(font);
+        ortFilter->setFixedWidth(ORT_WIDTH);
 
-        StatusFilter = new ModQComboBox(this, this);
-        StatusFilter->move(QPoint(colWPosX.CalcPosX(QString("Status")), FILTER_QLINEEDIT_Y));
-        StatusFilter->setFont(font);
-        StatusFilter->setFixedWidth(STATUS_WIDTH);
+        statusFilter = new ModQComboBox(this, this);
+        statusFilter->setEditable(true);
+        statusFilter->setInsertPolicy(QComboBox::NoInsert);
+        statusFilter->move(QPoint(colWPosX.CalcPosX(QString("Status")), FILTER_QLINEEDIT_Y));
+        statusFilter->setFont(font);
+        statusFilter->setFixedWidth(STATUS_WIDTH);
+        statusModel = new QSqlTableModel(this, dbInterface->GetDatabase());
+        statusModel->setTable(STATUS_TABLE);
+        statusFilter->setModel(statusModel);
+        statusFilter->setModelColumn(STATUS_STATUS_POS);
+        statusModel->select();
 
-        AnredeFilter = new ModQComboBox(this, this);
-        AnredeFilter->move(QPoint(colWPosX.CalcPosX(QString("Anrede")), FILTER_QLINEEDIT_Y));
-        AnredeFilter->setFont(font);
-        AnredeFilter->setFixedWidth(ANREDE_WIDTH);
+        anredeFilter = new ModQComboBox(this, this);
+        anredeFilter->setEditable(true);
+        anredeFilter->setInsertPolicy(QComboBox::NoInsert);
+        anredeFilter->move(QPoint(colWPosX.CalcPosX(QString("Anrede")), FILTER_QLINEEDIT_Y));
+        anredeFilter->setFont(font);
+        anredeFilter->setFixedWidth(ANREDE_WIDTH);
+        anredeModel = new QSqlTableModel(this, dbInterface->GetDatabase());
+        anredeModel->setTable(ANREDE_TABLE);
+        anredeFilter->setModel(anredeModel);
+        anredeFilter->setModelColumn(ANREDE_ANREDE_POS);
+        anredeModel->select();
 
-        AmtstitelFilter = new ModQComboBox(this, this);
-        AmtstitelFilter->move(QPoint(colWPosX.CalcPosX(QString("Amtstitel")), FILTER_QLINEEDIT_Y));
-        AmtstitelFilter->setFont(font);
-        AmtstitelFilter->setFixedWidth(AMTSTITEL_WIDTH);
+        amtstitelFilter = new ModQComboBox(this, this);
+        amtstitelFilter->setEditable(true);
+        amtstitelFilter->setInsertPolicy(QComboBox::NoInsert);
+        amtstitelFilter->move(QPoint(colWPosX.CalcPosX(QString("Amtstitel")), FILTER_QLINEEDIT_Y));
+        amtstitelFilter->setFont(font);
+        amtstitelFilter->setFixedWidth(AMTSTITEL_WIDTH);
+        amtstitelModel = new QSqlTableModel(this, dbInterface->GetDatabase());
+        amtstitelModel->setTable(AMTSTITEL_TABLE);
+        amtstitelFilter->setModel(amtstitelModel);
+        amtstitelFilter->setModelColumn(AMTSTITEL_AMTSTITEL_POS);
+        amtstitelModel->select();
 
     }
     catch(std::bad_alloc exc)
@@ -145,17 +167,17 @@ AbonnentenInlandSuche::AbonnentenInlandSuche(DBInterface *dbInterface, QWidget *
 
     //connect signal with slots
     QObject::connect(this->IDFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->TitelVorFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->TitelNachFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->VornameFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->NachnameFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->OrganisationFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->StrasseFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
+    QObject::connect(this->titelVorFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
+    QObject::connect(this->titelNachFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
+    QObject::connect(this->vornameFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
+    QObject::connect(this->nachnameFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
+    QObject::connect(this->organisationFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
+    QObject::connect(this->strasseFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
     QObject::connect(this->PLZFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->OrtFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->StatusFilter, &ModQComboBox::editTextChanged, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->AnredeFilter, &ModQComboBox::editTextChanged, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->AmtstitelFilter, &ModQComboBox::editTextChanged, this, &AbonnentenInlandSuche::FiltersChanged);
+    QObject::connect(this->ortFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
+    QObject::connect(this->statusFilter, &ModQComboBox::editTextChanged, this, &AbonnentenInlandSuche::FiltersChanged);
+    QObject::connect(this->anredeFilter, &ModQComboBox::editTextChanged, this, &AbonnentenInlandSuche::FiltersChanged);
+    QObject::connect(this->amtstitelFilter, &ModQComboBox::editTextChanged, this, &AbonnentenInlandSuche::FiltersChanged);
 
     ResetFilters();
 }
@@ -163,17 +185,17 @@ AbonnentenInlandSuche::AbonnentenInlandSuche(DBInterface *dbInterface, QWidget *
 AbonnentenInlandSuche::~AbonnentenInlandSuche()
 {
     delete IDFilter;
-    delete TitelVorFilter;
-    delete TitelNachFilter;
-    delete VornameFilter;
-    delete NachnameFilter;
-    delete OrganisationFilter;
-    delete StrasseFilter;
+    delete titelVorFilter;
+    delete titelNachFilter;
+    delete vornameFilter;
+    delete nachnameFilter;
+    delete organisationFilter;
+    delete strasseFilter;
     delete PLZFilter;
-    delete OrtFilter;
-    delete StatusFilter;
-    delete AnredeFilter;
-    delete AmtstitelFilter;
+    delete ortFilter;
+    delete statusFilter;
+    delete anredeFilter;
+    delete amtstitelFilter;
     delete ui;
     tableHeaderList.clear();
 }
@@ -329,12 +351,16 @@ void AbonnentenInlandSuche::AddRow(TableRowData tableRowData, bool update)
 
 /**
  * @brief AbonnentenInlandSuche::FiltersChanged Slot function that is called, whenever a filter (line edit or combobox) is changed
+ * @details Also refreshes the models of the combo boxes!
  * @param text The new text that changed
  */
 void AbonnentenInlandSuche::FiltersChanged(const QString &text)
 {
-    QString sqlString = BuildQueryString();
-    ExecuteQueryUpdateTable(sqlString);
+    if(prFilterChange == false)
+    {
+        QString sqlString = BuildQueryString();
+        ExecuteQueryUpdateTable(sqlString);
+    }
     return;
 }
 
@@ -344,8 +370,9 @@ void AbonnentenInlandSuche::FiltersChanged(const QString &text)
  * @param firstWhereClause States whether there already exsists a clause in the supplied string \sqlString
  * @param columnName Name of the column for which this clause implements a criteria
  * @param filterContent Content of the filter for the column \c columnName (line edit or combobox)
+ * @param strictComparison If true searches for the exact string in \c filterContent, otherwise only looks for the substring \c filterContent
  */
-void AbonnentenInlandSuche::BuildQueryStringPart(QString& sqlString, bool& firstWhereClause, QString columnName, QString filterContent)
+void AbonnentenInlandSuche::BuildQueryStringPart(QString& sqlString, bool& firstWhereClause, QString columnName, QString filterContent, bool strictComparison)
 {
     if(firstWhereClause == true)
     {
@@ -357,9 +384,18 @@ void AbonnentenInlandSuche::BuildQueryStringPart(QString& sqlString, bool& first
 
     sqlString.append(QString(" (`"));
     sqlString.append(columnName);
-    sqlString.append(QString("` LIKE \'%"));
-    sqlString.append(filterContent);
-    sqlString.append(QString("%\')"));
+    if(strictComparison)
+    {
+        sqlString.append(QString("` LIKE \'"));
+        sqlString.append(filterContent);
+        sqlString.append(QString("\')"));
+    }
+    else
+    {
+        sqlString.append(QString("` LIKE \'%"));
+        sqlString.append(filterContent);
+        sqlString.append(QString("%\')"));
+    }
     return;
 }
 
@@ -377,94 +413,75 @@ QString AbonnentenInlandSuche::BuildQueryString(void)
 
     text = IDFilter->text();
     if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, QString("ID"), text);
+        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_ID, text, true);
 
-    text = TitelVorFilter->text();
+    text = titelVorFilter->text();
     if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, QString("TitelVorgestellt"), text);
+        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_TITELVOR, text, false);
 
-    text = TitelNachFilter->text();
+    text = titelNachFilter->text();
     if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, QString("TitelNachgestellt"), text);
+        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_TITELNACH, text, false);
 
-    text = VornameFilter->text();
+    text = vornameFilter->text();
     if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, QString("Vorname"), text);
+        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_VORNAME, text, false);
 
-    text = NachnameFilter->text();
+    text = nachnameFilter->text();
     if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, QString("Nachname"), text);
+        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_NACHNAME, text, false);
 
-    text = OrganisationFilter->text();
+    text = organisationFilter->text();
     if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, QString("Organisation"), text);
+        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_ORGANISATION, text, false);
 
-    text = StrasseFilter->text();
+    text = strasseFilter->text();
     if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, QString("Straße"), text);
+        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_STRASSE, text, false);
 
     text = PLZFilter->text();
     if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, QString("PLZallgemein"), text);
+        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_PLZALLGEMEIN, text, false);
 
-    text = OrtFilter->text();
+    text = ortFilter->text();
     if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, QString("Ortallgemein"), text);
+        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_ORTALLGEMEIN, text, false);
 
-    text = StatusFilter->currentText();
+    text = statusFilter->currentText();
     if(!text.isNull() && !text.isEmpty())
-        ComboboxBuildQueryString(sqlString, QString("statust"), QString("Status"), text, QString("Status"), firstWhereClause);
+        ComboboxBuildQueryString(sqlString, statusFilter, ABONNENTEN_STATUS, firstWhereClause);
 
-    text = AnredeFilter->currentText();
+    text = anredeFilter->currentText();
     if(!text.isNull() && !text.isEmpty())
-        ComboboxBuildQueryString(sqlString, QString("anredet"), QString("Anrede"), text, QString("Anrede"), firstWhereClause);
+        ComboboxBuildQueryString(sqlString, anredeFilter, ABONNENTEN_ANREDE, firstWhereClause);
 
-    text = AmtstitelFilter->currentText();
+    text = amtstitelFilter->currentText();
     if(!text.isNull() && !text.isEmpty())
-        ComboboxBuildQueryString(sqlString, QString("amtstitelt"), QString("Amtstitel"), text, QString("Amtstitel"), firstWhereClause);
+        ComboboxBuildQueryString(sqlString, amtstitelFilter, ABONNENTEN_AMTSTITEL, firstWhereClause);
 
     //set the sort order
     if(ui->checkBoxSortByChangeDate->isChecked() == true)
-        sqlString.append(QString(" ORDER BY `letzteÄnderung` DESC, `Nachname` ASC, `Vorname` ASC"));
+        sqlString.append(QString(" ORDER BY `" + ABONNENTEN_LETZTEAENDERUNG + "` DESC, `" + ABONNENTEN_NACHNAME + "` ASC, `" + ABONNENTEN_VORNAME + "` ASC"));
     else
-        sqlString.append(" ORDER BY `Nachname` ASC, `Vorname` ASC");
+        sqlString.append(" ORDER BY `" + ABONNENTEN_NACHNAME + "` ASC, `" + ABONNENTEN_VORNAME + "` ASC");
 
     return sqlString;
 }
 
 
 /**
- * @brief AbonnentenInlandSuche::ComboboxBuildQueryString Builds a query part for \c sqlString.
+ * @brief AbonnentenInlandSuche::ComboboxBuildQueryString Builds a query part for \c sqlString given content from a combo box with an underlying QSqlTableModel
  * 		  This method assumes that the primary key element column of the comboboxes underlying table is called "ID"
  * @param sqlString SQL string for which to build a query part
- * @param tableName Name of the table
- * @param comboboxColumnName Name of the table's column corresponding to the combobox element
- * @param comboboxText Text that is currently present in the combobox's line edit element
+ * @param comboBox Combo box with a QSqlTableModel
  * @param columnName Name of the "main" table's column
  * @param firstWhereClause States whether this is the first "WHERE-clause" in \c sqlString
  */
-void AbonnentenInlandSuche::ComboboxBuildQueryString(QString& sqlString, QString tableName, QString comboboxColumnName, QString comboboxText, QString columnName, bool& firstWhereClause)
+void AbonnentenInlandSuche::ComboboxBuildQueryString(QString& sqlString, QComboBox *comboBox, QString columnName, bool& firstWhereClause)
 {
-    QSqlQuery comboboxQuery(dbInterface->GetDatabase());
-    QString comboboxSqlString("SELECT ID FROM `");
-    comboboxSqlString.append(tableName);
-    comboboxSqlString.append("` WHERE `");
-    comboboxSqlString.append(comboboxColumnName);
-    comboboxSqlString.append("` LIKE (\'");
-    comboboxSqlString.append(comboboxText);
-    comboboxSqlString.append("\')");
 
-    if(comboboxQuery.exec(comboboxSqlString) == false)
-    {
-        qInfo() << comboboxQuery.lastError().text();
-        qInfo() << "comboboxSqlString: " << comboboxSqlString;
-        errorMan.BailOut("Error with comboboxQuery.exec\n", __FILE__, __LINE__, FAILURE);
-    }
-    while(comboboxQuery.next())
-    {
-        QString ID = comboboxQuery.value(0).toString();
-        BuildQueryStringPart(sqlString, firstWhereClause, columnName, ID);
-    }
+    QString ID = static_cast<QSqlTableModel*>(comboBox->model())->record(comboBox->currentIndex()).value(ID_POS).toString();
+    BuildQueryStringPart(sqlString, firstWhereClause, columnName, ID, true);
     return;
 }
 
@@ -499,26 +516,31 @@ void AbonnentenInlandSuche::keyPressEvent(QKeyEvent *event)
  */
 void AbonnentenInlandSuche::ResetFilters(void)
 {
+    bool prFilterChangeOld = prFilterChange;
+    prFilterChange = true;
     ClearTable();
     IDFilter->clear();
-    TitelVorFilter->clear();
-    TitelNachFilter->clear();
-    VornameFilter->clear();
-    NachnameFilter->clear();
-    OrganisationFilter->clear();
-    StrasseFilter->clear();
+    titelVorFilter->clear();
+    titelNachFilter->clear();
+    vornameFilter->clear();
+    nachnameFilter->clear();
+    organisationFilter->clear();
+    strasseFilter->clear();
     PLZFilter->clear();
-    OrtFilter->clear();
+    ortFilter->clear();
 
-    StatusFilter->clearEditText();
-    AnredeFilter->clearEditText();
-    AmtstitelFilter->clearEditText();
+    statusFilter->clearEditText();
+    anredeFilter->clearEditText();
+    amtstitelFilter->clearEditText();
+    statusModel->select();
+    anredeModel->select();
+    amtstitelModel->select();
 
     ui->checkBoxSortByChangeDate->setChecked(false);
 
-    QString sqlString = BuildQueryString();
-    ExecuteQueryUpdateTable(sqlString);
-    VornameFilter->setFocus();
+    prFilterChange = prFilterChangeOld;
+    FiltersChanged(nullptr);
+    vornameFilter->setFocus();
 }
 
 /**
@@ -616,4 +638,52 @@ void AbonnentenInlandSuche::on_tableWidget_cellClicked(int row, int column)
 void AbonnentenInlandSuche::on_exportButton_clicked()
 {
     //TODO
+}
+
+/**
+ * @brief AbonnentenInlandSuche::RefreshComboboxModels Reloads the content of the combo box filters
+ * @details Calling select() on the model of a combo box resets the combo box's content!
+ */
+void AbonnentenInlandSuche::RefreshComboboxModels()
+{
+    RefreshComboBoxModel(statusFilter);
+    RefreshComboBoxModel(anredeFilter);
+    RefreshComboBoxModel(amtstitelFilter);
+}
+
+/**
+ * @brief AbonnentenInlandSuche::RefreshComboBoxModel A function to reload the contents of a combo box.
+ * Tries to restore the old position of the combo box if it is still in the table of the combo box content
+ * @details Works only for combo boxes, whose underlying model is of type QSqlTableModel!
+ * @param comboBox The combo box, whose content table should be reloaded
+ */
+void AbonnentenInlandSuche::RefreshComboBoxModel(QComboBox *comboBox)
+{
+    //Since calling select on a combo box's model resets the current text/selected element, we have to temporarily save and restore it
+    //if the combo box's current edit line is not empty
+    bool prFilterChangeOld = prFilterChange;
+    prFilterChange = true;
+    if(comboBox->currentIndex() != -1)
+    {
+        //Save the current ID
+        int ID = static_cast<QSqlTableModel*>(comboBox->model())->record(comboBox->currentIndex()).value(ID_POS).toInt();
+        static_cast<QSqlTableModel*>(comboBox->model())->select();
+        //if the combo box was not empty
+        if(ID != 0)
+        {
+            for(int index = 0; index < comboBox->count(); index++)
+            {
+                if(static_cast<QSqlTableModel*>(comboBox->model())->record(index).value(ID_POS).toInt() == ID)
+                {
+                    comboBox->setCurrentIndex(index);
+                    break;
+                }
+            }
+        }
+    }
+    else
+    {
+        static_cast<QSqlTableModel*>(comboBox->model())->select();
+    }
+    prFilterChange = prFilterChangeOld;
 }
