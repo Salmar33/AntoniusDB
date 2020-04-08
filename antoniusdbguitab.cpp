@@ -12,8 +12,8 @@ AntoniusDBGUITab::AntoniusDBGUITab(DBInterface *dbInterface, QWidget *parent) :
     ui(new Ui::AntoniusDBGUITab)
 {
     ui->setupUi(this);
-    this->addTab(new AbonnentenInland(dbInterface, this), QString("Abonnenten Inland"));
-    this->addTab(new AbonnentenInlandSuche(dbInterface, this), QString("Abonnenten Inland Suche"));
+    this->addTab(new Abonnenten(dbInterface, this), QString("Abonnenten"));
+    this->addTab(new AbonnentenSuche(dbInterface, this), QString("Abonnenten Suche"));
 }
 
 AntoniusDBGUITab::~AntoniusDBGUITab()

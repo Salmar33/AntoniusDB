@@ -2,9 +2,9 @@
 #include "ui_abonnenten.h"
 #include <QKeyEvent>
 
-AbonnentenInland::AbonnentenInland(DBInterface *dbInterface, QWidget *parent) :
+Abonnenten::Abonnenten(DBInterface *dbInterface, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::AbonnentenInland)
+    ui(new Ui::Abonnenten)
 {
     ui->setupUi(this);
 
@@ -94,7 +94,7 @@ AbonnentenInland::AbonnentenInland(DBInterface *dbInterface, QWidget *parent) :
     LoadActiveRecord();
 }
 
-AbonnentenInland::~AbonnentenInland()
+Abonnenten::~Abonnenten()
 {
     delete ui;
     delete amtstitelModel;
@@ -105,12 +105,12 @@ AbonnentenInland::~AbonnentenInland()
 }
 
 /**
- * @brief AbonnentenInland::eventFilter Event filter to detect, when one of the combo boxes loses focus or return is pressed in order to update them
+ * @brief Abonnenten::eventFilter Event filter to detect, when one of the combo boxes loses focus or return is pressed in order to update them
  * @param object The object, whose event has been caught
  * @param event The caught event
  * @return False if the event can be handled further by \c object itself (according to the docu) otherwise true
  */
-bool AbonnentenInland::eventFilter(QObject *object, QEvent *event)
+bool Abonnenten::eventFilter(QObject *object, QEvent *event)
 {
     static std::atomic_flag atomicFlag = ATOMIC_FLAG_INIT;
     bool oldPrChange = prChange;
@@ -173,7 +173,7 @@ bool AbonnentenInland::eventFilter(QObject *object, QEvent *event)
 /**
  * @brief Slot function for when the "Heute" button is released to set the date
  */
-void AbonnentenInland::on_buttonHeute_released()
+void Abonnenten::on_buttonHeute_released()
 {
     //if the "heute" button is pressed, write the current date in the dateErstelltAm text field and update the record in the database
     ui->dateErstelltAm->setDate(QDate::currentDate());
@@ -185,7 +185,7 @@ void AbonnentenInland::on_buttonHeute_released()
  * @brief Overridden Key Event Handler
  * @param event The key event, which is to be handled
  */
-void AbonnentenInland::keyPressEvent(QKeyEvent *event)
+void Abonnenten::keyPressEvent(QKeyEvent *event)
 {
     // if CTRL + D is pressed, then move the cursor to the txtEditAnmerkungen field and enter the current date if not yet present
     if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_D)
@@ -204,10 +204,10 @@ void AbonnentenInland::keyPressEvent(QKeyEvent *event)
 }
 
 /**
- * @brief AbonnentenInland::keyReleaseEvent Overridden key event handler
+ * @brief Abonnenten::keyReleaseEvent Overridden key event handler
  * @param event The key even, which is to be handled upon release of a key
  */
-void AbonnentenInland::keyReleaseEvent(QKeyEvent *event)
+void Abonnenten::keyReleaseEvent(QKeyEvent *event)
 {
     if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_Left)
     {
@@ -226,7 +226,7 @@ void AbonnentenInland::keyReleaseEvent(QKeyEvent *event)
 /**
  * @brief Moves the cursor to the Anmerkungen Edit field and writes down the current date in a new line if not yet present
  */
-void AbonnentenInland::MoveToAnmerkungen(void)
+void Abonnenten::MoveToAnmerkungen(void)
 {
     ui->txtEditAnmerkungen->setFocus();
     QString text = ui->txtEditAnmerkungen->document()->toPlainText();
@@ -246,11 +246,11 @@ void AbonnentenInland::MoveToAnmerkungen(void)
 }
 
 /**
- * @brief AbonnentenInland::SetPreviousRecordActive Sets the \c activeID variable to the previous record (ordered by IDs) in the ABONNENTEN_TABLE table.
+ * @brief Abonnenten::SetPreviousRecordActive Sets the \c activeID variable to the previous record (ordered by IDs) in the ABONNENTEN_TABLE table.
  * 													If the active record is already the first record \c activeID is left unchanged.
  * @details Changes \c activeID
  */
-void AbonnentenInland::SetPreviousRecordActive()
+void Abonnenten::SetPreviousRecordActive()
 {
     QSqlQuery sqlQuery(dbInterface->GetDatabase());
     QString sqlString("SELECT `" + ABONNENTEN_ID + "` FROM `" + ABONNENTEN_TABLE + "` ORDER BY `" + ABONNENTEN_ID + "` ASC");
@@ -276,11 +276,11 @@ void AbonnentenInland::SetPreviousRecordActive()
 }
 
 /**
- * @brief AbonnentenInland::SetNextRecordActive Sets the \c activeID variable to the next record (ordered by IDs) in the ABONNENTEN_TABLE table.
+ * @brief Abonnenten::SetNextRecordActive Sets the \c activeID variable to the next record (ordered by IDs) in the ABONNENTEN_TABLE table.
  * 													If the active record is already the last record \c activeID is left unchanged.
  * @details Changes \c activeID
  */
-void AbonnentenInland::SetNextRecordActive()
+void Abonnenten::SetNextRecordActive()
 {
     QSqlQuery sqlQuery(dbInterface->GetDatabase());
     QString sqlString("SELECT `" + ABONNENTEN_ID + "` FROM `" + ABONNENTEN_TABLE + "` ORDER BY `" + ABONNENTEN_ID + "` ASC");
@@ -306,9 +306,9 @@ void AbonnentenInland::SetNextRecordActive()
 }
 
 /**
- * @brief AbonnentenInland::on_pushButtonNewRecord_clicked When this button was clicked a new record is added to the database
+ * @brief Abonnenten::on_pushButtonNewRecord_clicked When this button was clicked a new record is added to the database
  */
-void AbonnentenInland::on_pushButtonNewRecord_clicked()
+void Abonnenten::on_pushButtonNewRecord_clicked()
 {
     QMessageBox::StandardButton messageBoxButton;
     QSqlQuery sqlQuery;
@@ -350,9 +350,9 @@ void AbonnentenInland::on_pushButtonNewRecord_clicked()
 
 
 /**
- * @brief AbonnentenInland::LoadActiveRecord Loads the active record (the record with ID \c activeID) from the database
+ * @brief Abonnenten::LoadActiveRecord Loads the active record (the record with ID \c activeID) from the database
  */
-void AbonnentenInland::LoadActiveRecord()
+void Abonnenten::LoadActiveRecord()
 {
     QSqlQuery sqlQuery(dbInterface->GetDatabase());
 
@@ -420,30 +420,30 @@ void AbonnentenInland::LoadActiveRecord()
 }
 
 /**
- * @brief AbonnentenInland::SetandUpdateDateTimeLastChange Updates the "letzte Änderung" date time field in the form and in the database with the current date
+ * @brief Abonnenten::SetandUpdateDateTimeLastChange Updates the "letzte Änderung" date time field in the form and in the database with the current date
  * @details Temporarily modies \c this->prChange
  */
-void AbonnentenInland::SetUpdateDateTimeLastChangeToCurrentDateTime(void)
+void Abonnenten::SetUpdateDateTimeLastChangeToCurrentDateTime(void)
 {
         QDateTime time = QDateTime::currentDateTime();
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_LETZTEAENDERUNG, time.toString(DATABASE_DATETIME_FORMAT), activeID);
 }
 
 /**
- * @brief AbonnentenInland::SetUpdateDateTimeForStatusChangeToCurrentDateTime Updates the "Status gesetzt" field in the form and database with the current date
+ * @brief Abonnenten::SetUpdateDateTimeForStatusChangeToCurrentDateTime Updates the "Status gesetzt" field in the form and database with the current date
  * @details Temporarily modies \c this->prChange
  */
-void AbonnentenInland::SetUpdateDateTimeForStatusChangeToCurrentDateTime(void)
+void Abonnenten::SetUpdateDateTimeForStatusChangeToCurrentDateTime(void)
 {
         QDateTime time = QDateTime::currentDateTime();
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_STATUSGESETZTAM, time.toString(DATABASE_DATETIME_FORMAT), activeID);
 }
 
 /**
- * @brief AbonnentenInland::on_lineEditTitelVor_textEdited Slot function to update the record in the database when the "Titel vorgestellt" field is edited
+ * @brief Abonnenten::on_lineEditTitelVor_textEdited Slot function to update the record in the database when the "Titel vorgestellt" field is edited
  * @param arg1 New content of the data field
  */
-void AbonnentenInland::on_lineEditTitelVor_textEdited(const QString &arg1)
+void Abonnenten::on_lineEditTitelVor_textEdited(const QString &arg1)
 {
     if(!prChange)
     {
@@ -454,10 +454,10 @@ void AbonnentenInland::on_lineEditTitelVor_textEdited(const QString &arg1)
 }
 
 /**
- * @brief AbonnentenInland::on_lineEditTitelNach_textEdited Slot function to update the record in the database when the "Titel nachgestellt" field is edited
+ * @brief Abonnenten::on_lineEditTitelNach_textEdited Slot function to update the record in the database when the "Titel nachgestellt" field is edited
  * @param arg1 New content of the data field
  */
-void AbonnentenInland::on_lineEditTitelNach_textEdited(const QString &arg1)
+void Abonnenten::on_lineEditTitelNach_textEdited(const QString &arg1)
 {
     if(!prChange)
     {
@@ -468,10 +468,10 @@ void AbonnentenInland::on_lineEditTitelNach_textEdited(const QString &arg1)
 }
 
 /**
- * @brief AbonnentenInland::on_lineEditVorname_textEdited Slot function to update the record in the database when the "Vorname" field is edited
+ * @brief Abonnenten::on_lineEditVorname_textEdited Slot function to update the record in the database when the "Vorname" field is edited
  * @param arg1 New content of the data field
  */
-void AbonnentenInland::on_lineEditVorname_textEdited(const QString &arg1)
+void Abonnenten::on_lineEditVorname_textEdited(const QString &arg1)
 {
     if(!prChange)
     {
@@ -482,10 +482,10 @@ void AbonnentenInland::on_lineEditVorname_textEdited(const QString &arg1)
 }
 
 /**
- * @brief AbonnentenInland::on_lineEditNachname_textEdited Slot function to update the record in the database when the "Nachname" field is edited
+ * @brief Abonnenten::on_lineEditNachname_textEdited Slot function to update the record in the database when the "Nachname" field is edited
  * @param arg1 New content of the data field
  */
-void AbonnentenInland::on_lineEditNachname_textEdited(const QString &arg1)
+void Abonnenten::on_lineEditNachname_textEdited(const QString &arg1)
 {
     if(!prChange)
     {
@@ -496,10 +496,10 @@ void AbonnentenInland::on_lineEditNachname_textEdited(const QString &arg1)
 }
 
 /**
- * @brief AbonnentenInland::on_lineEditOrganisation_textEdited Slot function to update the record in the database when the "Organisation" field is edited
+ * @brief Abonnenten::on_lineEditOrganisation_textEdited Slot function to update the record in the database when the "Organisation" field is edited
  * @param arg1 New content of the data field
  */
-void AbonnentenInland::on_lineEditOrganisation_textEdited(const QString &arg1)
+void Abonnenten::on_lineEditOrganisation_textEdited(const QString &arg1)
 {
     if(!prChange)
     {
@@ -510,10 +510,10 @@ void AbonnentenInland::on_lineEditOrganisation_textEdited(const QString &arg1)
 }
 
 /**
- * @brief AbonnentenInland::on_lineEditStrasse_textEdited Slot function to update the record in the database when the "Straße" field is edited
+ * @brief Abonnenten::on_lineEditStrasse_textEdited Slot function to update the record in the database when the "Straße" field is edited
  * @param arg1 New content of the data field
  */
-void AbonnentenInland::on_lineEditStrasse_textEdited(const QString &arg1)
+void Abonnenten::on_lineEditStrasse_textEdited(const QString &arg1)
 {
     if(!prChange)
     {
@@ -524,10 +524,10 @@ void AbonnentenInland::on_lineEditStrasse_textEdited(const QString &arg1)
 }
 
 /**
- * @brief AbonnentenInland::on_lineEditLand_textEdited Slot function to update the record in the database when the "Land" field is edited
+ * @brief Abonnenten::on_lineEditLand_textEdited Slot function to update the record in the database when the "Land" field is edited
  * @param arg1 New content of the data field
  */
-void AbonnentenInland::on_lineEditLand_textEdited(const QString &arg1)
+void Abonnenten::on_lineEditLand_textEdited(const QString &arg1)
 {
     if(!prChange)
     {
@@ -538,10 +538,10 @@ void AbonnentenInland::on_lineEditLand_textEdited(const QString &arg1)
 }
 
 /**
- * @brief AbonnentenInland::on_lineEditPLZ_textEdited Slot function to update the record in the database when the "PLZ" field is edited
+ * @brief Abonnenten::on_lineEditPLZ_textEdited Slot function to update the record in the database when the "PLZ" field is edited
  * @param arg1 New content of the data field
  */
-void AbonnentenInland::on_lineEditPLZ_textEdited(const QString &arg1)
+void Abonnenten::on_lineEditPLZ_textEdited(const QString &arg1)
 {
     if(!prChange)
     {
@@ -552,10 +552,10 @@ void AbonnentenInland::on_lineEditPLZ_textEdited(const QString &arg1)
 }
 
 /**
- * @brief AbonnentenInland::on_lineEditOrt_textEdited Slot function to update the record in the database when the "Ort" field is edited
+ * @brief Abonnenten::on_lineEditOrt_textEdited Slot function to update the record in the database when the "Ort" field is edited
  * @param arg1 New content of the data field
  */
-void AbonnentenInland::on_lineEditOrt_textEdited(const QString &arg1)
+void Abonnenten::on_lineEditOrt_textEdited(const QString &arg1)
 {
     if(!prChange)
     {
@@ -566,10 +566,10 @@ void AbonnentenInland::on_lineEditOrt_textEdited(const QString &arg1)
 }
 
 /**
- * @brief AbonnentenInland::on_lineEditMietcode_textEdited Slot function to update the record in the database when the "Mietcode" field is edited
+ * @brief Abonnenten::on_lineEditMietcode_textEdited Slot function to update the record in the database when the "Mietcode" field is edited
  * @param arg1 New content of the data field
  */
-void AbonnentenInland::on_lineEditMietcode_textEdited(const QString &arg1)
+void Abonnenten::on_lineEditMietcode_textEdited(const QString &arg1)
 {
     if(!prChange)
     {
@@ -580,10 +580,10 @@ void AbonnentenInland::on_lineEditMietcode_textEdited(const QString &arg1)
 }
 
 /**
- * @brief AbonnentenInland::on_lineEditZusatzinfo_textEdited Slot function to update the record in the database when the "Zusatzinfo" field is edited
+ * @brief Abonnenten::on_lineEditZusatzinfo_textEdited Slot function to update the record in the database when the "Zusatzinfo" field is edited
  * @param arg1 New content of the data field
  */
-void AbonnentenInland::on_lineEditZusatzinfo_textEdited(const QString &arg1)
+void Abonnenten::on_lineEditZusatzinfo_textEdited(const QString &arg1)
 {
     if(!prChange)
     {
@@ -594,10 +594,10 @@ void AbonnentenInland::on_lineEditZusatzinfo_textEdited(const QString &arg1)
 }
 
 /**
- * @brief AbonnentenInland::on_lineEditTelNr_textEdited Slot function to update the record in the database when the "TelNr" field is edited
+ * @brief Abonnenten::on_lineEditTelNr_textEdited Slot function to update the record in the database when the "TelNr" field is edited
  * @param arg1 New content of the data field
  */
-void AbonnentenInland::on_lineEditTelNr_textEdited(const QString &arg1)
+void Abonnenten::on_lineEditTelNr_textEdited(const QString &arg1)
 {
     if(!prChange)
     {
@@ -608,10 +608,10 @@ void AbonnentenInland::on_lineEditTelNr_textEdited(const QString &arg1)
 }
 
 /**
- * @brief AbonnentenInland::on_lineEditMobil_textEdited Slot function to update the record in the database when the "Mobil" field is edited
+ * @brief Abonnenten::on_lineEditMobil_textEdited Slot function to update the record in the database when the "Mobil" field is edited
  * @param arg1 New content of the data field
  */
-void AbonnentenInland::on_lineEditMobil_textEdited(const QString &arg1)
+void Abonnenten::on_lineEditMobil_textEdited(const QString &arg1)
 {
     if(!prChange)
     {
@@ -621,10 +621,10 @@ void AbonnentenInland::on_lineEditMobil_textEdited(const QString &arg1)
 }
 
 /**
- * @brief AbonnentenInland::on_lineEditEmail_textEdited Slot function to update the record in the database when the "Email" field is edited
+ * @brief Abonnenten::on_lineEditEmail_textEdited Slot function to update the record in the database when the "Email" field is edited
  * @param arg1 New content of the data field
  */
-void AbonnentenInland::on_lineEditEmail_textEdited(const QString &arg1)
+void Abonnenten::on_lineEditEmail_textEdited(const QString &arg1)
 {
     if(!prChange)
     {
@@ -635,10 +635,10 @@ void AbonnentenInland::on_lineEditEmail_textEdited(const QString &arg1)
 }
 
 /**
- * @brief AbonnentenInland::on_lineEditBeruf_textEdited Slot function to update the record in the database when the "Beruf/Tätigkeit" field is edited
+ * @brief Abonnenten::on_lineEditBeruf_textEdited Slot function to update the record in the database when the "Beruf/Tätigkeit" field is edited
  * @param arg1 New content of the data field
  */
-void AbonnentenInland::on_lineEditBeruf_textEdited(const QString &arg1)
+void Abonnenten::on_lineEditBeruf_textEdited(const QString &arg1)
 {
     if(!prChange)
     {
@@ -649,9 +649,9 @@ void AbonnentenInland::on_lineEditBeruf_textEdited(const QString &arg1)
 }
 
 /**
- * @brief AbonnentenInland::on_txtEditAnmerkungen_textChanged Slot function to update the record in the database when the "Anmerkungen" field is edited
+ * @brief Abonnenten::on_txtEditAnmerkungen_textChanged Slot function to update the record in the database when the "Anmerkungen" field is edited
  */
-void AbonnentenInland::on_txtEditAnmerkungen_textChanged()
+void Abonnenten::on_txtEditAnmerkungen_textChanged()
 {
     if(!prChange)
     {
@@ -662,10 +662,10 @@ void AbonnentenInland::on_txtEditAnmerkungen_textChanged()
 }
 
 /**
- * @brief AbonnentenInland::on_checkDankschreiben_clicked Slot function to update the "Dankeschreiben" column, when the "Dankschreiben" checkbox is clicked
+ * @brief Abonnenten::on_checkDankschreiben_clicked Slot function to update the "Dankeschreiben" column, when the "Dankschreiben" checkbox is clicked
  * @param checked True if the if the button is checked and false otherwise
  */
-void AbonnentenInland::on_checkDankschreiben_clicked(bool checked)
+void Abonnenten::on_checkDankschreiben_clicked(bool checked)
 {
     if(!prChange)
     {
@@ -680,9 +680,9 @@ void AbonnentenInland::on_checkDankschreiben_clicked(bool checked)
 }
 
 /**
- * @brief AbonnentenInland::on_spinAntoniusAnzahl_editingFinished Slot function to update the "Antoniusanzahl" column, when the corresponding spinbox is changed and the spinbox loses focus
+ * @brief Abonnenten::on_spinAntoniusAnzahl_editingFinished Slot function to update the "Antoniusanzahl" column, when the corresponding spinbox is changed and the spinbox loses focus
  */
-void AbonnentenInland::on_spinAntoniusAnzahl_editingFinished()
+void Abonnenten::on_spinAntoniusAnzahl_editingFinished()
 {
     if(!prChange)
     {
@@ -693,10 +693,10 @@ void AbonnentenInland::on_spinAntoniusAnzahl_editingFinished()
 }
 
 /**
- * @brief AbonnentenInland::on_dateErstelltAm_dateTimeChanged Slot function to update the "erstellt am" entry, when the correspnding field in the form is changed
+ * @brief Abonnenten::on_dateErstelltAm_dateTimeChanged Slot function to update the "erstellt am" entry, when the correspnding field in the form is changed
  * @param dateTime The new date and time
  */
-void AbonnentenInland::on_dateErstelltAm_dateTimeChanged(const QDateTime &dateTime)
+void Abonnenten::on_dateErstelltAm_dateTimeChanged(const QDateTime &dateTime)
 {
     if(!prChange)
     {
@@ -714,10 +714,10 @@ void AbonnentenInland::on_dateErstelltAm_dateTimeChanged(const QDateTime &dateTi
 }
 
 /**
- * @brief AbonnentenInland::on_dateStatusGesetzt_dateTimeChanged Flots function to update the "Status gesetzt am" entry, when the content of the corresponding field in the form is changed
+ * @brief Abonnenten::on_dateStatusGesetzt_dateTimeChanged Flots function to update the "Status gesetzt am" entry, when the content of the corresponding field in the form is changed
  * @param dateTime The new date and time
  */
-void AbonnentenInland::on_dateStatusGesetzt_dateTimeChanged(const QDateTime &dateTime)
+void Abonnenten::on_dateStatusGesetzt_dateTimeChanged(const QDateTime &dateTime)
 {
     if(!prChange)
     {
@@ -735,7 +735,7 @@ void AbonnentenInland::on_dateStatusGesetzt_dateTimeChanged(const QDateTime &dat
 }
 
 /**
- * @brief AbonnentenInland::HandleComboBoxManipulationTableModel Handles the manipulation of combo boxes - should be called after the line edit of a combo box has been changed (and lost focus or similar) or a new item has been selected
+ * @brief Abonnenten::HandleComboBoxManipulationTableModel Handles the manipulation of combo boxes - should be called after the line edit of a combo box has been changed (and lost focus or similar) or a new item has been selected
  * 		  It handles the update of the main table and the update of the combo box table in case a new item was chosen to be added to the combo box
  * @details Only works for combo boxes that get their data directly via a QSqlTableModel
  *			This method does not work for combo boxes that use a QSqlRelationalTableModel and get their entries from a junction table
@@ -752,7 +752,7 @@ void AbonnentenInland::on_dateStatusGesetzt_dateTimeChanged(const QDateTime &dat
  * @param atomicFlag Reference to an atomic flag that will prevent this function to be called simultaneously by multiple threads
  * @return true if \c columnMain in \c tableMain was actually updated with a new value (which could also be empty, meaning the field was effectively cleared) otherwise false
  */
-bool AbonnentenInland::HandleComboBoxManipulationTableModel(QComboBox *comboBox, QString comboBoxTable, QString comboBoxColumnName, QString comboBoxColumnID, QString tableMain, QString columnMain, unsigned int currentID, bool allowNew, std::atomic_flag& atomicFlag)
+bool Abonnenten::HandleComboBoxManipulationTableModel(QComboBox *comboBox, QString comboBoxTable, QString comboBoxColumnName, QString comboBoxColumnID, QString tableMain, QString columnMain, unsigned int currentID, bool allowNew, std::atomic_flag& atomicFlag)
 {
     bool returnVal = false;
     //if the atomic flag was not set previously set it (check and set done atomically)
@@ -829,7 +829,7 @@ bool AbonnentenInland::HandleComboBoxManipulationTableModel(QComboBox *comboBox,
 }
 
 /**
- * @brief AbonnentenInland::HandleComboBoxManipulationRelationalTableModel Handles the manipulation of combo boxes - should be called after the line edit of a combo box has been changed (and lost focus or similar) or a new item has been selected
+ * @brief Abonnenten::HandleComboBoxManipulationRelationalTableModel Handles the manipulation of combo boxes - should be called after the line edit of a combo box has been changed (and lost focus or similar) or a new item has been selected
  * 		  It handles the update of the main table and the update of the combo box table in case a new item was chosen to be added to the combo box
  * @details Only works for combo boxes that get their data via a QSqlRelationalTableModel
  * 			For combo boxes that get their content from a QSqlTableModel use HandleComboBoxManipulationTableModel() instead
@@ -848,7 +848,7 @@ bool AbonnentenInland::HandleComboBoxManipulationTableModel(QComboBox *comboBox,
  * @param otherJuncColumnID The name of the ID column of the junction table for the "other" key element (it is assumed that the primary key for this junction table is a pair)
  * @param otherCurrentID Current ID value of the junction table for the currently active record
  */
-void AbonnentenInland::HandleComboBoxManipulationRelationalTableModel(QComboBox *comboBox, QString comboBoxTable, QString comboBoxColumnName, QString tableMain, QString columnMain, unsigned int currentID, bool allowNewJunc, std::atomic_flag& atomicFlag, QString juncTable, QString thisJuncColumnID, QString otherJuncColumnID, unsigned int otherCurrentID)
+void Abonnenten::HandleComboBoxManipulationRelationalTableModel(QComboBox *comboBox, QString comboBoxTable, QString comboBoxColumnName, QString tableMain, QString columnMain, unsigned int currentID, bool allowNewJunc, std::atomic_flag& atomicFlag, QString juncTable, QString thisJuncColumnID, QString otherJuncColumnID, unsigned int otherCurrentID)
 {
     //if the atomic flag was not set previously set it (check and set done atomically)
     if(!atomicFlag.test_and_set())
@@ -923,18 +923,18 @@ void AbonnentenInland::HandleComboBoxManipulationRelationalTableModel(QComboBox 
 }
 
 /**
- * @brief AbonnentenInland::SetActiveID Sets the active ID of this form
+ * @brief Abonnenten::SetActiveID Sets the active ID of this form
  * @param newActiveID The new active ID
  */
-void AbonnentenInland::SetActiveID(unsigned int newActiveID)
+void Abonnenten::SetActiveID(unsigned int newActiveID)
 {
     this->activeID = newActiveID;
 }
 
 /**
- * @brief AbonnentenInland::on_buttonBuchungHinzu_clicked Slot function for when the "Buchung hinzufügen" button is clicked
+ * @brief Abonnenten::on_buttonBuchungHinzu_clicked Slot function for when the "Buchung hinzufügen" button is clicked
  */
-void AbonnentenInland::on_buttonBuchungHinzu_clicked()
+void Abonnenten::on_buttonBuchungHinzu_clicked()
 {
     BuchungHinzu buchungDialog(activeID, dbInterface, this);
     buchungDialog.exec();

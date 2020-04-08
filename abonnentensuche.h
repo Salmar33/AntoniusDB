@@ -43,10 +43,10 @@ extern ErrorManagement errorMan;
 
 
 namespace Ui {
-class AbonnentenInlandSuche;
+class AbonnentenSuche;
 }
 
-class AbonnentenInlandSuche : public QWidget
+class AbonnentenSuche : public QWidget
 {
     Q_OBJECT
 
@@ -78,9 +78,9 @@ public:
     class ModQLineEdit : public QLineEdit
     {
     private:
-        AbonnentenInlandSuche *outerClassInstance;
+        AbonnentenSuche *outerClassInstance;
     public:
-        ModQLineEdit(QWidget *parent, AbonnentenInlandSuche *outerClassInstance);
+        ModQLineEdit(QWidget *parent, AbonnentenSuche *outerClassInstance);
         ~ModQLineEdit();
         void keyPressEvent(QKeyEvent *event);
     };
@@ -90,15 +90,15 @@ public:
     class ModQComboBox : public QComboBox
     {
     private:
-        AbonnentenInlandSuche *outerClassInstance;
+        AbonnentenSuche *outerClassInstance;
     public:
-        ModQComboBox(QWidget *parent, AbonnentenInlandSuche *outerClassInstance);
+        ModQComboBox(QWidget *parent, AbonnentenSuche *outerClassInstance);
         ~ModQComboBox();
         void keyPressEvent(QKeyEvent *event);
     };
 
-    explicit AbonnentenInlandSuche(DBInterface *dbInterface, QWidget *parent);
-    ~AbonnentenInlandSuche();
+    explicit AbonnentenSuche(DBInterface *dbInterface, QWidget *parent);
+    ~AbonnentenSuche();
 
     void ClearTable(void);
     void AddRow(TableRowData, bool update);
@@ -110,10 +110,11 @@ private slots:
 
     void on_tableWidget_cellClicked(int row, int column);
 
-    void on_exportButton_clicked();
+    void on_exportButton_clicked(void);
+    void ExportRoutine(void);
 
 private:
-    Ui::AbonnentenInlandSuche *ui;
+    Ui::AbonnentenSuche *ui;
     QWidget *parent;
     bool prFilterChange;
 

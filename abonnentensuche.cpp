@@ -5,9 +5,9 @@
 //for testing only
 #include <QThread>
 
-AbonnentenInlandSuche::AbonnentenInlandSuche(DBInterface *dbInterface, QWidget *parent) :
+AbonnentenSuche::AbonnentenSuche(DBInterface *dbInterface, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::AbonnentenInlandSuche)
+    ui(new Ui::AbonnentenSuche)
 {
     ui->setupUi(this);
     this->dbInterface = dbInterface;
@@ -166,23 +166,23 @@ AbonnentenInlandSuche::AbonnentenInlandSuche(DBInterface *dbInterface, QWidget *
     ui->tableWidget->update();
 
     //connect signal with slots
-    QObject::connect(this->IDFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->titelVorFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->titelNachFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->vornameFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->nachnameFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->organisationFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->strasseFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->PLZFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->ortFilter, &ModQLineEdit::textEdited, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->statusFilter, &ModQComboBox::editTextChanged, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->anredeFilter, &ModQComboBox::editTextChanged, this, &AbonnentenInlandSuche::FiltersChanged);
-    QObject::connect(this->amtstitelFilter, &ModQComboBox::editTextChanged, this, &AbonnentenInlandSuche::FiltersChanged);
+    QObject::connect(this->IDFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->titelVorFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->titelNachFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->vornameFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->nachnameFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->organisationFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->strasseFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->PLZFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->ortFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->statusFilter, &ModQComboBox::editTextChanged, this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->anredeFilter, &ModQComboBox::editTextChanged, this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->amtstitelFilter, &ModQComboBox::editTextChanged, this, &AbonnentenSuche::FiltersChanged);
 
     ResetFilters();
 }
 
-AbonnentenInlandSuche::~AbonnentenInlandSuche()
+AbonnentenSuche::~AbonnentenSuche()
 {
     delete IDFilter;
     delete titelVorFilter;
@@ -201,9 +201,9 @@ AbonnentenInlandSuche::~AbonnentenInlandSuche()
 }
 
 /**
- * @brief AbonnentenInlandSuche::TableRowData::TableRowData Standard constructor without arguments
+ * @brief AbonnentenSuche::TableRowData::TableRowData Standard constructor without arguments
  */
-AbonnentenInlandSuche::TableRowData::TableRowData()
+AbonnentenSuche::TableRowData::TableRowData()
 {
     this->ID = "";
     this->status = "";
@@ -221,7 +221,7 @@ AbonnentenInlandSuche::TableRowData::TableRowData()
     this->zusatzinfo = "";
 }
 /**
- * @brief AbonnentenInlandSuche::TableRowData Simple Constructor for a TableRowData struct
+ * @brief AbonnentenSuche::TableRowData Simple Constructor for a TableRowData struct
  * @param ID
  * @param status
  * @param anrede
@@ -235,7 +235,7 @@ AbonnentenInlandSuche::TableRowData::TableRowData()
  * @param antoniusanzahl
  * @param zusatzinfo
  */
-AbonnentenInlandSuche::TableRowData::TableRowData(QString ID, QString status, QString anrede, QString amtstitel, QString titelVor, QString titelNach, QString vorname, QString nachname, QString organisation, QString strasse, QString plz, QString ort, QString antoniusanzahl, QString zusatzinfo)
+AbonnentenSuche::TableRowData::TableRowData(QString ID, QString status, QString anrede, QString amtstitel, QString titelVor, QString titelNach, QString vorname, QString nachname, QString organisation, QString strasse, QString plz, QString ort, QString antoniusanzahl, QString zusatzinfo)
 {
     this->ID = ID;
     this->status = status;
@@ -254,17 +254,17 @@ AbonnentenInlandSuche::TableRowData::TableRowData(QString ID, QString status, QS
 }
 
 /**
- * @brief AbonnentenInlandSuche::ModQLineEdit::ModQLineEdit Constructor for the from QLineEdit inherited class ModQLineEdit
+ * @brief AbonnentenSuche::ModQLineEdit::ModQLineEdit Constructor for the from QLineEdit inherited class ModQLineEdit
  * @param parent QWidget that "owns" this object (passed on to base class)
  * @param outerClassInstance Instance of enclosing class object
  */
-AbonnentenInlandSuche::ModQLineEdit::ModQLineEdit(QWidget *parent, AbonnentenInlandSuche *outerClassInstance) : QLineEdit(parent)
+AbonnentenSuche::ModQLineEdit::ModQLineEdit(QWidget *parent, AbonnentenSuche *outerClassInstance) : QLineEdit(parent)
 {
     this->outerClassInstance = outerClassInstance;
 }
-AbonnentenInlandSuche::ModQLineEdit::~ModQLineEdit() {}
+AbonnentenSuche::ModQLineEdit::~ModQLineEdit() {}
 
-void AbonnentenInlandSuche::ModQLineEdit::keyPressEvent(QKeyEvent *event)
+void AbonnentenSuche::ModQLineEdit::keyPressEvent(QKeyEvent *event)
 {
     if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Backspace)
         outerClassInstance->ResetFilters();
@@ -274,17 +274,17 @@ void AbonnentenInlandSuche::ModQLineEdit::keyPressEvent(QKeyEvent *event)
 }
 
 /**
- * @brief AbonnentenInlandSuche::ModQComboBox::ModQComboBox Constructor for the from QComboBox inherited class ModQComboBox
+ * @brief AbonnentenSuche::ModQComboBox::ModQComboBox Constructor for the from QComboBox inherited class ModQComboBox
  * @param parent QWidget that "owns" this object (passed on to base class)
  * @param outerClassInstance Instance of enclosing class object
  */
-AbonnentenInlandSuche::ModQComboBox::ModQComboBox(QWidget *parent, AbonnentenInlandSuche *outerClassInstance) : QComboBox(parent)
+AbonnentenSuche::ModQComboBox::ModQComboBox(QWidget *parent, AbonnentenSuche *outerClassInstance) : QComboBox(parent)
 {
     this->outerClassInstance = outerClassInstance;
 }
-AbonnentenInlandSuche::ModQComboBox::~ModQComboBox() {}
+AbonnentenSuche::ModQComboBox::~ModQComboBox() {}
 
-void AbonnentenInlandSuche::ModQComboBox::keyPressEvent(QKeyEvent *event)
+void AbonnentenSuche::ModQComboBox::keyPressEvent(QKeyEvent *event)
 {
     if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Backspace)
         outerClassInstance->ResetFilters();
@@ -295,9 +295,9 @@ void AbonnentenInlandSuche::ModQComboBox::keyPressEvent(QKeyEvent *event)
 
 
 /**
- * @brief AbonnentenInlandSuche::ClearTable Clears the contents of the table widget
+ * @brief AbonnentenSuche::ClearTable Clears the contents of the table widget
  */
-void AbonnentenInlandSuche::ClearTable(void)
+void AbonnentenSuche::ClearTable(void)
 {
     //ui->tableWidget->clearContents();
     ui->tableWidget->setRowCount(0);
@@ -308,11 +308,11 @@ void AbonnentenInlandSuche::ClearTable(void)
 
 
 /**
- * @brief AbonnentenInlandSuche::AddRow Adds a row to the table widget of this form
+ * @brief AbonnentenSuche::AddRow Adds a row to the table widget of this form
  * @param tableRowData Data to fill each column entry of the row with
  * @param update Whether or not the corresponding table widget should be updated to make the changes instantly visible or not (for multiple successive updates setting this to false might improve performance)
  */
-void AbonnentenInlandSuche::AddRow(TableRowData tableRowData, bool update)
+void AbonnentenSuche::AddRow(TableRowData tableRowData, bool update)
 {
     int rowCount = ui->tableWidget->rowCount();
 
@@ -350,11 +350,11 @@ void AbonnentenInlandSuche::AddRow(TableRowData tableRowData, bool update)
 }
 
 /**
- * @brief AbonnentenInlandSuche::FiltersChanged Slot function that is called, whenever a filter (line edit or combobox) is changed
+ * @brief AbonnentenSuche::FiltersChanged Slot function that is called, whenever a filter (line edit or combobox) is changed
  * @details Also refreshes the models of the combo boxes!
  * @param text The new text that changed
  */
-void AbonnentenInlandSuche::FiltersChanged(const QString &text)
+void AbonnentenSuche::FiltersChanged(const QString &text)
 {
     if(prFilterChange == false)
     {
@@ -365,14 +365,14 @@ void AbonnentenInlandSuche::FiltersChanged(const QString &text)
 }
 
 /**
- * @brief AbonnentenInlandSuche::BuildQueryStringPart Builds part of an sql string for a query
+ * @brief AbonnentenSuche::BuildQueryStringPart Builds part of an sql string for a query
  * @param sqlString The string to which to append an SQL statement
  * @param firstWhereClause States whether there already exsists a clause in the supplied string \sqlString
  * @param columnName Name of the column for which this clause implements a criteria
  * @param filterContent Content of the filter for the column \c columnName (line edit or combobox)
  * @param strictComparison If true searches for the exact string in \c filterContent, otherwise only looks for the substring \c filterContent
  */
-void AbonnentenInlandSuche::BuildQueryStringPart(QString& sqlString, bool& firstWhereClause, QString columnName, QString filterContent, bool strictComparison)
+void AbonnentenSuche::BuildQueryStringPart(QString& sqlString, bool& firstWhereClause, QString columnName, QString filterContent, bool strictComparison)
 {
     if(firstWhereClause == true)
     {
@@ -401,10 +401,10 @@ void AbonnentenInlandSuche::BuildQueryStringPart(QString& sqlString, bool& first
 
 
 /**
- * @brief AbonnentenInlandSuche::BuildQueryString Builds a query depending on the content of the filters (line edit and combobox elements on the search form)
+ * @brief AbonnentenSuche::BuildQueryString Builds a query depending on the content of the filters (line edit and combobox elements on the search form)
  * @return Returns a QString containing an SQL query
  */
-QString AbonnentenInlandSuche::BuildQueryString(void)
+QString AbonnentenSuche::BuildQueryString(void)
 {
     bool firstWhereClause = true;
     QString sqlString("SELECT * FROM `" + ABONNENTEN_TABLE + "` ");
@@ -470,14 +470,14 @@ QString AbonnentenInlandSuche::BuildQueryString(void)
 
 
 /**
- * @brief AbonnentenInlandSuche::ComboboxBuildQueryString Builds a query part for \c sqlString given content from a combo box with an underlying QSqlTableModel
+ * @brief AbonnentenSuche::ComboboxBuildQueryString Builds a query part for \c sqlString given content from a combo box with an underlying QSqlTableModel
  * 		  This method assumes that the primary key element column of the comboboxes underlying table is called "ID"
  * @param sqlString SQL string for which to build a query part
  * @param comboBox Combo box with a QSqlTableModel
  * @param columnName Name of the "main" table's column
  * @param firstWhereClause States whether this is the first "WHERE-clause" in \c sqlString
  */
-void AbonnentenInlandSuche::ComboboxBuildQueryString(QString& sqlString, QComboBox *comboBox, QString columnName, bool& firstWhereClause)
+void AbonnentenSuche::ComboboxBuildQueryString(QString& sqlString, QComboBox *comboBox, QString columnName, bool& firstWhereClause)
 {
 
     QString ID = static_cast<QSqlTableModel*>(comboBox->model())->record(comboBox->currentIndex()).value(ID_POS).toString();
@@ -487,11 +487,11 @@ void AbonnentenInlandSuche::ComboboxBuildQueryString(QString& sqlString, QComboB
 
 
 /**
- * @brief AbonnentenInlandSuche::on_checkBoxSortByChangeDate_stateChanged This slot is activated when the state of the "SortByChangeDate" checkbox is changed
+ * @brief AbonnentenSuche::on_checkBoxSortByChangeDate_stateChanged This slot is activated when the state of the "SortByChangeDate" checkbox is changed
  * @note This slot was automatically created by the UI wizard
  * @param arg1
  */
-void AbonnentenInlandSuche::on_checkBoxSortByChangeDate_stateChanged(int arg1)
+void AbonnentenSuche::on_checkBoxSortByChangeDate_stateChanged(int arg1)
 {
     QString sqlString = BuildQueryString();
     ExecuteQueryUpdateTable(sqlString);
@@ -502,7 +502,7 @@ void AbonnentenInlandSuche::on_checkBoxSortByChangeDate_stateChanged(int arg1)
  * @brief Key Event Handler
  * @param event The key event, which is to be handled
  */
-void AbonnentenInlandSuche::keyPressEvent(QKeyEvent *event)
+void AbonnentenSuche::keyPressEvent(QKeyEvent *event)
 {
     if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Backspace)
         ResetFilters();
@@ -512,9 +512,9 @@ void AbonnentenInlandSuche::keyPressEvent(QKeyEvent *event)
 }
 
 /**
- * @brief AbonnentenInlandSuche::ResetFilters Resets all the filters (line edits and combo boxes)
+ * @brief AbonnentenSuche::ResetFilters Resets all the filters (line edits and combo boxes)
  */
-void AbonnentenInlandSuche::ResetFilters(void)
+void AbonnentenSuche::ResetFilters(void)
 {
     bool prFilterChangeOld = prFilterChange;
     prFilterChange = true;
@@ -544,10 +544,10 @@ void AbonnentenInlandSuche::ResetFilters(void)
 }
 
 /**
- * @brief AbonnentenInlandSuche::ExecuteQueryUpdateTable Executes the query and displays the results in the corresponding table widget
+ * @brief AbonnentenSuche::ExecuteQueryUpdateTable Executes the query and displays the results in the corresponding table widget
  * @param sqlString QString containing the SQL query
  */
-void AbonnentenInlandSuche::ExecuteQueryUpdateTable(QString sqlString)
+void AbonnentenSuche::ExecuteQueryUpdateTable(QString sqlString)
 {
     QSqlQuery query(dbInterface->GetDatabase());
 
@@ -583,20 +583,20 @@ void AbonnentenInlandSuche::ExecuteQueryUpdateTable(QString sqlString)
     UpdateLCDNum();
 }
 
-QString AbonnentenInlandSuche::GetStatusName(QString statusID)
+QString AbonnentenSuche::GetStatusName(QString statusID)
 {
     return dbInterface->GetNameFromID(STATUS_TABLE, statusID);
 }
-QString AbonnentenInlandSuche::GetAnredeName(QString  anredeID)
+QString AbonnentenSuche::GetAnredeName(QString  anredeID)
 {
     return dbInterface->GetNameFromID(ANREDE_TABLE, anredeID);
 }
-QString AbonnentenInlandSuche::GetAmtstitelName(QString amtstitelID)
+QString AbonnentenSuche::GetAmtstitelName(QString amtstitelID)
 {
     return dbInterface->GetNameFromID(AMTSTITEL_TABLE, amtstitelID);
 }
 
-void AbonnentenInlandSuche::UpdateLCDNum()
+void AbonnentenSuche::UpdateLCDNum()
 {
     ui->lcdNumTableRows->display(ui->tableWidget->rowCount());
     if(ui->lcdNumTableRows->intValue() == 0)
@@ -607,11 +607,11 @@ void AbonnentenInlandSuche::UpdateLCDNum()
 }
 
 /**
- * @brief AbonnentenInlandSuche::on_tableWidget_cellClicked Slot function for when a cell on the table widget is clicked
+ * @brief AbonnentenSuche::on_tableWidget_cellClicked Slot function for when a cell on the table widget is clicked
  * @param row Row that was clicked
  * @param column Column that was clicked
  */
-void AbonnentenInlandSuche::on_tableWidget_cellClicked(int row, int column)
+void AbonnentenSuche::on_tableWidget_cellClicked(int row, int column)
 {
     if(column == ABONNENTEN_SUCHE_CLICK_COLUMN)
     {
@@ -620,31 +620,48 @@ void AbonnentenInlandSuche::on_tableWidget_cellClicked(int row, int column)
         {
             errorMan.BailOut("Error, item() returned NULL pointer", __FILE__, __LINE__, FAILURE);
         }
-        AbonnentenInland *abonnentenInlandWidget = static_cast<AbonnentenInland*>(static_cast<QTabWidget*>(parent)->widget(ABONNENTEN_TAB));
-        if(abonnentenInlandWidget == nullptr)
+        Abonnenten *abonnentenWidget = static_cast<Abonnenten*>(static_cast<QTabWidget*>(parent)->widget(ABONNENTEN_TAB));
+        if(abonnentenWidget == nullptr)
         {
             errorMan.BailOut("Error, widget() returned NULL pointer", __FILE__, __LINE__, FAILURE);
         }
         unsigned int selectedID = tableWidgetItem->text().toUInt();
-        abonnentenInlandWidget->SetActiveID(selectedID);
-        abonnentenInlandWidget->LoadActiveRecord();
+        abonnentenWidget->SetActiveID(selectedID);
+        abonnentenWidget->LoadActiveRecord();
         static_cast<QTabWidget*>(parent)->setCurrentIndex(ABONNENTEN_TAB);
     }
 }
 
 /**
- * @brief AbonnentenInlandSuche::on_exportButton_clicked Slot function for when the export button is clicked
+ * @brief AbonnentenSuche::on_exportButton_clicked Slot function for when the export button is clicked
+ * 		  Starts the export routine
  */
-void AbonnentenInlandSuche::on_exportButton_clicked()
+void AbonnentenSuche::on_exportButton_clicked()
 {
-    //TODO
+    ExportRoutine();
 }
 
 /**
- * @brief AbonnentenInlandSuche::RefreshComboboxModels Reloads the content of the combo box filters
+ * @brief AbonnentenSuche::ExportRoutine Starts the export for the "Druckerei"
+ * @details Creates 4 .csv files consisting of only active subscribers of the Antonius magazine split as follows:
+ * 			.) Inland, Brief (Antonius Anzahl = 1)
+ * 			.) Inland, Paket (Antonius Anzahl > 1)
+ * 			.) Ausland, Brief (Antonius Anzahl = 1)
+ * 			.) Ausland, Paket (Antonius Anzahl > 1)
+ */
+void AbonnentenSuche::ExportRoutine(void)
+{
+    QSqlQuery query(dbInterface->GetDatabase());
+    //TODO
+    QString sqlStringInlandLetter = "SELECT * FROM " ;
+}
+
+
+/**
+ * @brief AbonnentenSuche::RefreshComboboxModels Reloads the content of the combo box filters
  * @details Calling select() on the model of a combo box resets the combo box's content!
  */
-void AbonnentenInlandSuche::RefreshComboboxModels()
+void AbonnentenSuche::RefreshComboboxModels()
 {
     RefreshComboBoxModel(statusFilter);
     RefreshComboBoxModel(anredeFilter);
@@ -652,12 +669,12 @@ void AbonnentenInlandSuche::RefreshComboboxModels()
 }
 
 /**
- * @brief AbonnentenInlandSuche::RefreshComboBoxModel A function to reload the contents of a combo box.
+ * @brief AbonnentenSuche::RefreshComboBoxModel A function to reload the contents of a combo box.
  * Tries to restore the old position of the combo box if it is still in the table of the combo box content
  * @details Works only for combo boxes, whose underlying model is of type QSqlTableModel!
  * @param comboBox The combo box, whose content table should be reloaded
  */
-void AbonnentenInlandSuche::RefreshComboBoxModel(QComboBox *comboBox)
+void AbonnentenSuche::RefreshComboBoxModel(QComboBox *comboBox)
 {
     //Since calling select on a combo box's model resets the current text/selected element, we have to temporarily save and restore it
     //if the combo box's current edit line is not empty

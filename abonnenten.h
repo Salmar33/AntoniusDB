@@ -18,21 +18,21 @@
 extern ErrorManagement errorMan;
 
 namespace Ui {
-class AbonnentenInland;
+class Abonnenten;
 }
 
-class AbonnentenInland : public QWidget
+class Abonnenten : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit AbonnentenInland(DBInterface *dbInterface, QWidget *parent = nullptr);
-    ~AbonnentenInland();
+    explicit Abonnenten(DBInterface *dbInterface, QWidget *parent = nullptr);
+    ~Abonnenten();
     void SetActiveID(unsigned int newActiveID);
     void LoadActiveRecord(void);
 
 private:
-    Ui::AbonnentenInland *ui;
+    Ui::Abonnenten *ui;
 
     unsigned int activeID;			//contains the ID of the currently active record that is displayed on this form
     bool prChange;					//should always be set to true before any changes of values in this form are done programmatically (e.g. for setup purposes)
