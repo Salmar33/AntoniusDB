@@ -184,4 +184,18 @@
 #define PLZ_ORT_JUNC_ORT_ID_POS				1
 
 
+/**********************************************************************/
+//default filenames and Co. regarding the data export
+
+#define INLAND_LETTER_FILENAME		"Antonius Briefe Inland.csv"
+#define AUSLAND_LETTER_FILENAME		"Antonius Briefe Ausland.csv"
+#define INLAND_PARCEL_FILENAME		"Antonius Pakete Inland.csv"
+#define AUSLAND_PARCEL_FILENAME		"Antonius Pakete Ausland.csv"
+
+#define INLAND_LETTER_NUMBER_OF_COLUMNS		13
+#define AUSLAND_LETTER_NUMBER_OF_COLUMNS	13
+#define INLAND_PARCEL_NUMBER_OF_COLUMNS		13
+#define AUSLAND_PARCEL_NUMBER_OF_COLUMNS	13
+
+
 #endif // DEFAULTMEASURES_H

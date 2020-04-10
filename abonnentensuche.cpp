@@ -5,6 +5,26 @@
 //for testing only
 #include <QThread>
 
+const QString EXPORT_SQL_PREFIX("SELECT " +
+        ABONNENTEN_TABLE + "." + ABONNENTEN_ID + ", " +
+        ANREDE_TABLE + "." + ANREDE_ANREDE + ", " +
+        AMTSTITEL_TABLE + "." + AMTSTITEL_AMTSTITEL + ", " +
+        ABONNENTEN_TITELVOR + ", " +
+        ABONNENTEN_VORNAME + ", " +
+        ABONNENTEN_NACHNAME + ", " +
+        ABONNENTEN_TITELNACH + ", " +
+        ABONNENTEN_ORGANISATION + ", `" +
+        ABONNENTEN_STRASSE + "`, " +
+        ABONNENTEN_PLZALLGEMEIN + ", " +
+        ABONNENTEN_ORTALLGEMEIN + ", " +
+        ABONNENTEN_ANTONIUSANZAHL + ", " +
+        ABONNENTEN_ZUSATZINFO +
+        " FROM " + ABONNENTEN_TABLE +
+        " LEFT JOIN " + ANREDE_TABLE + " ON " + ANREDE_TABLE + "." + ANREDE_ID + " = " + ABONNENTEN_TABLE + "." + ABONNENTEN_ANREDE +
+        " LEFT JOIN " + AMTSTITEL_TABLE + " ON " + AMTSTITEL_TABLE + "." + AMTSTITEL_ID + " = " + ABONNENTEN_TABLE + "." + ABONNENTEN_AMTSTITEL +
+        " WHERE " +
+        ABONNENTEN_STATUS + " = '0' AND ");
+
 AbonnentenSuche::AbonnentenSuche(DBInterface *dbInterface, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AbonnentenSuche)
@@ -652,8 +672,55 @@ void AbonnentenSuche::on_exportButton_clicked()
 void AbonnentenSuche::ExportRoutine(void)
 {
     QSqlQuery query(dbInterface->GetDatabase());
-    //TODO
-    QString sqlStringInlandLetter = "SELECT * FROM " ;
+    QString sqlStringInlandLetter = EXPORT_SQL_PREFIX +
+        ABONNENTEN_LAND + " = 'A' AND " +
+        ABONNENTEN_ANTONIUSANZAHL + " = '1'";
+    QString sqlStringAuslandLetter = EXPORT_SQL_PREFIX +
+        ABONNENTEN_LAND + " <> 'A' AND " +
+        ABONNENTEN_ANTONIUSANZAHL + " = '1'";
+    QString sqlStringInlandParcel = EXPORT_SQL_PREFIX +
+        ABONNENTEN_LAND + " = 'A' AND " +
+        ABONNENTEN_ANTONIUSANZAHL + " > '1'";
+    QString sqlStringAuslandParcel = EXPORT_SQL_PREFIX +
+        ABONNENTEN_LAND + " <> 'A' AND " +
+        ABONNENTEN_ANTONIUSANZAHL + " > '1'";
+
+    WriteExportQueryOutputToCSVFile(QDate::currentDate().toString(DATABASE_DATE_FORMAT) + " - " + INLAND_LETTER_FILENAME, sqlStringInlandLetter, INLAND_LETTER_NUMBER_OF_COLUMNS);
+    WriteExportQueryOutputToCSVFile(QDate::currentDate().toString(DATABASE_DATE_FORMAT) + " - " + AUSLAND_LETTER_FILENAME, sqlStringAuslandLetter, AUSLAND_LETTER_NUMBER_OF_COLUMNS);
+    WriteExportQueryOutputToCSVFile(QDate::currentDate().toString(DATABASE_DATE_FORMAT) + " - " + INLAND_PARCEL_FILENAME, sqlStringInlandParcel, INLAND_PARCEL_NUMBER_OF_COLUMNS);
+    WriteExportQueryOutputToCSVFile(QDate::currentDate().toString(DATABASE_DATE_FORMAT) + " - " + AUSLAND_PARCEL_FILENAME, sqlStringAuslandParcel, AUSLAND_PARCEL_NUMBER_OF_COLUMNS);
+    QMessageBox::information(this, "Export", "Export has been successful!", QMessageBox::Ok, QMessageBox::Ok);
+}
+
+/**
+ * @brief AbonnentenSuche::WriteExportQueryOutputToCSVFile Writes the result of an SQL query to a file formatted as .csv file
+ * @param fileName The name of the .csv file
+ * @param queryString QString containing the SQL specification of the query
+ * @param numberOfColumns The number of columns to extract from the query
+ */
+void AbonnentenSuche::WriteExportQueryOutputToCSVFile(QString fileName, QString queryString, unsigned int numberOfColumns)
+{
+    QFile file(fileName, this);
+    if(!file.open(QIODevice::WriteOnly | QIODevice::ReadWrite))
+    {
+        qInfo() << "Could not open file" << fileName;
+        errorMan.BailOut("Error could not open" + fileName.toLocal8Bit(), __FILE__, __LINE__, FAILURE);
+        return;
+    }
+
+    QSqlQuery query(dbInterface->GetDatabase());
+    query.exec(queryString);
+    while(query.next())
+    {
+        for(int z = 0; static_cast<unsigned int>(z) < numberOfColumns; z++)
+        {
+            file.write(query.value(z).toByteArray());
+            file.write(",");
+        }
+        file.write("\r\n");
+    }
+    file.flush();
+    file.close();
 }
 
 

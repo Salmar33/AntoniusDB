@@ -13,6 +13,7 @@
 #include <QDebug>
 #include <QSqlDatabase>
 #include <QFileDialog>
+#include <QFile>
 #include "columnwidthposx.h"
 #include "ErrorManagement/ErrorManagement.h"
 #include "defaultmeasures.h"
@@ -41,6 +42,8 @@ extern ErrorManagement errorMan;
 #define ANTONIUSANZAHL_WIDTH		100
 #define ZUSATZINFO_WIDTH			80
 
+
+extern const QString EXPORT_SQL_PREFIX;
 
 namespace Ui {
 class AbonnentenSuche;
@@ -112,6 +115,7 @@ private slots:
 
     void on_exportButton_clicked(void);
     void ExportRoutine(void);
+    void WriteExportQueryOutputToCSVFile(QString fileName, QString queryString, unsigned int numberOfColumns);
 
 private:
     Ui::AbonnentenSuche *ui;
