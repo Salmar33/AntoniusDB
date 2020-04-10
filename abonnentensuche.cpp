@@ -17,6 +17,7 @@ const QString EXPORT_SQL_PREFIX("SELECT " +
         ABONNENTEN_STRASSE + "`, " +
         ABONNENTEN_PLZALLGEMEIN + ", " +
         ABONNENTEN_ORTALLGEMEIN + ", " +
+        ABONNENTEN_LAND + ", " +
         ABONNENTEN_ANTONIUSANZAHL + ", " +
         ABONNENTEN_ZUSATZINFO +
         " FROM " + ABONNENTEN_TABLE +
