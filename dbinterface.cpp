@@ -66,7 +66,7 @@ QString DBInterface::GetNameFromID(QString table, QString ID)
     {
         qInfo() << query.lastError().text();
         qInfo() << "sqlString: " << sqlString;
-        errorMan.BailOut("Error with query.exec", __FILE__, __LINE__, FAILURE);
+        errorMan.BailOut("Error with query.exec: " + query.lastError().text().toLocal8Bit(), __FILE__, __LINE__, FAILURE);
     }
     if(query.next() == false)
         returnString = QString("");
@@ -89,7 +89,7 @@ unsigned int DBInterface::GetIDFromValue(QString table, QString valueColumn, QSt
     if(query.exec(sqlString) == false)
     {
         qInfo() << "sqlString: " << sqlString;
-        errorMan.BailOut("Error with query.exec()", __FILE__, __LINE__, FAILURE);
+        errorMan.BailOut("Error with query.exec(): \nsqlString: " + sqlString.toLocal8Bit(), __FILE__, __LINE__, FAILURE);
     }
     if(query.next() == false)
     {
