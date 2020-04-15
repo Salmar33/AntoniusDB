@@ -198,4 +198,21 @@
 #define AUSLAND_PARCEL_NUMBER_OF_COLUMNS	14
 
 
+/**********************************************************************/
+//column names in the export .csv files
+#define ABONNENTEN_ID_EXPORT				"ID"
+#define ABONNENTEN_ANREDE_EXPORT			"Anrede"
+#define ABONNENTEN_AMTSTITEL_EXPORT			"Amtstitel"
+#define ABONNENTEN_TITELVOR_EXPORT			"Titel vorgestellt"
+#define ABONNENTEN_VORNAME_EXPORT			"Vorname"
+#define ABONNENTEN_NACHNAME_EXPORT			"Nachname"
+#define ABONNENTEN_TITELNACH_EXPORT			"Titel nachgestellt"
+#define ABONNENTEN_ORGANISATION_EXPORT		"Organisation"
+#define ABONNENTEN_STRASSE_EXPORT			"Straße"
+#define ABONNENTEN_PLZALLGEMEIN_EXPORT		"PLZ"
+#define ABONNENTEN_ORTALLGEMEIN_EXPORT		"Ort"
+#define ABONNENTEN_LAND_EXPORT				"Land"
+#define ABONNENTEN_ANTONIUSANZAHL_EXPORT	"Antoniusanzahl"
+#define ABONNENTEN_ZUSATZINFO_EXPORT		"Zusatzinfo"
+
 #endif // DEFAULTMEASURES_H

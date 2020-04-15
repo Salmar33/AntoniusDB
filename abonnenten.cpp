@@ -72,9 +72,10 @@ Abonnenten::Abonnenten(DBInterface *dbInterface, QWidget *parent) :
 
     //look up and display the first record in the database
     QSqlQuery sqlQuery(dbInterface->GetDatabase());
-    if(sqlQuery.exec("SELECT * FROM `" + ABONNENTEN_TABLE + "` ORDER BY `ID` ASC LIMIT 1") == false)
+    QString sqlString = "SELECT * FROM `" + ABONNENTEN_TABLE + "` ORDER BY `ID` ASC LIMIT 1";
+    if(sqlQuery.exec(sqlString) == false)
     {
-        errorMan.BailOut("Error with sqlQuery.exec()", __FILE__, __LINE__, FAILURE);
+        errorMan.BailOut("Error with sqlQuery.exec()\nsqlString: " + sqlString.toLocal8Bit() + "\n" + sqlQuery.lastError().text().toLocal8Bit(), __FILE__, __LINE__, FAILURE);
     }
     if(sqlQuery.next() == false)
     {
@@ -125,7 +126,7 @@ bool Abonnenten::eventFilter(QObject *object, QEvent *event)
             if(sqlQuery.exec(sqlString) == false)
             {
                 qInfo() << "sqlString: " << sqlString;
-                errorMan.BailOut("Error with sqlQuery.exec()", __FILE__, __LINE__, FAILURE);
+                errorMan.BailOut("Error with sqlQuery.exec()\nsqlString: " + sqlString.toLocal8Bit() + "\n" + sqlQuery.lastError().text().toLocal8Bit(), __FILE__, __LINE__, FAILURE);
             }
             if(sqlQuery.next() == false)
             {
@@ -258,7 +259,7 @@ void Abonnenten::SetPreviousRecordActive()
     if(sqlQuery.exec(sqlString) == false)
     {
         qInfo() << "sqlString: " << sqlString;
-        errorMan.BailOut("Error with sqlQuery.exec()", __FILE__, __LINE__, FAILURE);
+        errorMan.BailOut("Error with sqlQuery.exec()\nsqlString: " + sqlString.toLocal8Bit() + "\n" + sqlQuery.lastError().text().toLocal8Bit(), __FILE__, __LINE__, FAILURE);
     }
 
     //iterate through all record IDs; when the active ID has been found set the active ID to the previous one in the iteration
@@ -288,7 +289,7 @@ void Abonnenten::SetNextRecordActive()
     if(sqlQuery.exec(sqlString) == false)
     {
         qInfo() << "sqlString: " << sqlString;
-        errorMan.BailOut("Error with sqlQuery.exec()", __FILE__, __LINE__, FAILURE);
+        errorMan.BailOut("Error with sqlQuery.exec()\nsqlString: " + sqlString.toLocal8Bit() + "\n" + sqlQuery.lastError().text().toLocal8Bit(), __FILE__, __LINE__, FAILURE);
     }
 
     //iterate through all record IDs; when the active ID has been found set the active ID to the next one in the iteration if it exists
@@ -330,13 +331,14 @@ void Abonnenten::on_pushButtonNewRecord_clicked()
         if(sqlQuery.exec(queryString) == false)
         {
             qInfo() << "queryString: " << queryString;
-            errorMan.BailOut("Error with sqlQuery.exec()", __FILE__, __LINE__, FAILURE);
+            errorMan.BailOut("Error with sqlQuery.exec()\nsqlString: " + queryString.toLocal8Bit() + "\n" + sqlQuery.lastError().text().toLocal8Bit(), __FILE__, __LINE__, FAILURE);
         }
 
         //look up the new record in the database and retrieve its ID and make this new ID the active ID
-        if(sqlQuery.exec("SELECT * FROM `" + ABONNENTEN_TABLE + "` ORDER BY `ID` DESC LIMIT 1") == false)
+        QString selectString = "SELECT * FROM `" + ABONNENTEN_TABLE + "` ORDER BY `ID` DESC LIMIT 1";
+        if(sqlQuery.exec(selectString) == false)
         {
-            errorMan.BailOut("Error with sqlQuery.exec()", __FILE__, __LINE__, FAILURE);
+            errorMan.BailOut("Error with sqlQuery.exec()\nselectString: " + selectString.toLocal8Bit() + "\n" + sqlQuery.lastError().text().toLocal8Bit(), __FILE__, __LINE__, FAILURE);
         }
         if(sqlQuery.next() == false)
         {
@@ -357,9 +359,10 @@ void Abonnenten::LoadActiveRecord()
     QSqlQuery sqlQuery(dbInterface->GetDatabase());
 
     //select the active record in the database
-    if(sqlQuery.exec("SELECT * FROM `" + ABONNENTEN_TABLE + "` WHERE `ID` = '" + QString::number(activeID) + "'") == false)
+    QString sqlString = "SELECT * FROM `" + ABONNENTEN_TABLE + "` WHERE `ID` = '" + QString::number(activeID) + "'";
+    if(sqlQuery.exec(sqlString) == false)
     {
-        errorMan.BailOut("Error with sqlQuery.exec()", __FILE__, __LINE__, FAILURE);
+        errorMan.BailOut("Error with sqlQuery.exec()\nsqlString: " + sqlString.toLocal8Bit() + "\n" + sqlQuery.lastError().text().toLocal8Bit(), __FILE__, __LINE__, FAILURE);
     }
     if(sqlQuery.next() == false)
     {
@@ -806,7 +809,7 @@ bool Abonnenten::HandleComboBoxManipulationTableModel(QComboBox *comboBox, QStri
                 if(sqlQuery.exec(sqlString) == false)
                 {
                     qInfo() << "sqlString : " << sqlString;
-                    errorMan.BailOut("Error with sqlQuery.exec()", __FILE__, __LINE__, FAILURE);
+                    errorMan.BailOut("Error with sqlQuery.exec()\nsqlString: " + sqlString.toLocal8Bit() + "\n" + sqlQuery.lastError().text().toLocal8Bit(), __FILE__, __LINE__, FAILURE);
                 }
                 if(sqlQuery.next())
                 {

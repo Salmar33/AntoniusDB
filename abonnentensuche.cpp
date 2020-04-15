@@ -42,41 +42,39 @@ AbonnentenSuche::AbonnentenSuche(DBInterface *dbInterface, QWidget *parent) :
 
     ui->tableWidget->verticalHeader()->hide();
 
-    //this object is used to correctly position the "line edit" objects (filters) over the corresponding columns
-    ColumnWidthPosX colWPosX;
-
     //initialization of table headers
-    colWPosX.Append(ID_WIDTH, QString("ID"));
     tableHeaderList.append(QString("ID"));
-    colWPosX.Append(STATUS_WIDTH, QString("Status"));
     tableHeaderList.append(QString("Status"));
-    colWPosX.Append(ANREDE_WIDTH, QString("Anrede"));
     tableHeaderList.append(QString("Anrede"));
-    colWPosX.Append(AMTSTITEL_WIDTH, QString("Amtstitel"));
     tableHeaderList.append(QString("Amtstitel"));
-    colWPosX.Append(TITEL_VOR_WIDTH, QString("Titel vorgestellt"));
     tableHeaderList.append(QString("Titel vorgestellt"));
-    colWPosX.Append(TITEL_NACH_WIDTH, QString("Titel nachgestellt"));
     tableHeaderList.append(QString("Titel nachgestellt"));
-    colWPosX.Append(VORNAME_WIDTH, QString("Vorname"));
     tableHeaderList.append(QString("Vorname"));
-    colWPosX.Append(NACHNAME_WIDTH, QString("Nachname"));
     tableHeaderList.append(QString("Nachname"));
-    colWPosX.Append(ORGANISATION_WIDTH, QString("Organisation"));
     tableHeaderList.append(QString("Organisation"));
-    colWPosX.Append(STRASSE_WIDTH, QString("Straße"));
     tableHeaderList.append(QString("Straße"));
-    colWPosX.Append(PLZ_WIDTH, QString("Plz"));
     tableHeaderList.append(QString("Plz"));
-    colWPosX.Append(ORT_WIDTH, QString("Ort"));
     tableHeaderList.append(QString("Ort"));
-    colWPosX.Append(ANTONIUSANZAHL_WIDTH, QString("Antoniusanzahl"));
     tableHeaderList.append(QString("Antoniusanzahl"));
-    colWPosX.Append(ZUSATZINFO_WIDTH, QString("Zusatzinfo"));
     tableHeaderList.append(QString("Zusatzinfo"));
-
     ui->tableWidget->setHorizontalHeaderLabels(tableHeaderList);
 
+    //set positions of the search fields (we also refer to them as "filters")
+    ColumnWidthPosX colWPosX;		//this object is used to correctly position the search fields (filters) over the corresponding columns
+    colWPosX.Append(ID_WIDTH, QString("ID"));
+    colWPosX.Append(STATUS_WIDTH, QString("Status"));
+    colWPosX.Append(ANREDE_WIDTH, QString("Anrede"));
+    colWPosX.Append(AMTSTITEL_WIDTH, QString("Amtstitel"));
+    colWPosX.Append(TITEL_VOR_WIDTH, QString("Titel vorgestellt"));
+    colWPosX.Append(TITEL_NACH_WIDTH, QString("Titel nachgestellt"));
+    colWPosX.Append(VORNAME_WIDTH, QString("Vorname"));
+    colWPosX.Append(NACHNAME_WIDTH, QString("Nachname"));
+    colWPosX.Append(ORGANISATION_WIDTH, QString("Organisation"));
+    colWPosX.Append(STRASSE_WIDTH, QString("Straße"));
+    colWPosX.Append(PLZ_WIDTH, QString("Plz"));
+    colWPosX.Append(ORT_WIDTH, QString("Ort"));
+    colWPosX.Append(ANTONIUSANZAHL_WIDTH, QString("Antoniusanzahl"));
+    colWPosX.Append(ZUSATZINFO_WIDTH, QString("Zusatzinfo"));
 
     ui->tableWidget->setColumnWidth(0, ID_WIDTH);
     ui->tableWidget->setColumnWidth(1, STATUS_WIDTH);
@@ -578,7 +576,7 @@ void AbonnentenSuche::ExecuteQueryUpdateTable(QString sqlString)
     {
         qInfo() << query.lastError().text();
         qInfo() << "sqlString: " << sqlString;
-        errorMan.BailOut("Error with query.exec\n", __FILE__, __LINE__, FAILURE);
+        errorMan.BailOut("Error with query.exec\nsqlString: " + sqlString.toLocal8Bit() + "\n" + query.lastError().text().toLocal8Bit(), __FILE__, __LINE__, FAILURE);
     }
     while(query.next())
     {
@@ -686,31 +684,53 @@ void AbonnentenSuche::ExportRoutine(void)
         ABONNENTEN_LAND + " <> 'A' AND " +
         ABONNENTEN_ANTONIUSANZAHL + " > '1'";
 
-    WriteExportQueryOutputToCSVFile(QDate::currentDate().toString(DATABASE_DATE_FORMAT) + " - " + INLAND_LETTER_FILENAME, sqlStringInlandLetter, INLAND_LETTER_NUMBER_OF_COLUMNS);
-    WriteExportQueryOutputToCSVFile(QDate::currentDate().toString(DATABASE_DATE_FORMAT) + " - " + AUSLAND_LETTER_FILENAME, sqlStringAuslandLetter, AUSLAND_LETTER_NUMBER_OF_COLUMNS);
-    WriteExportQueryOutputToCSVFile(QDate::currentDate().toString(DATABASE_DATE_FORMAT) + " - " + INLAND_PARCEL_FILENAME, sqlStringInlandParcel, INLAND_PARCEL_NUMBER_OF_COLUMNS);
-    WriteExportQueryOutputToCSVFile(QDate::currentDate().toString(DATABASE_DATE_FORMAT) + " - " + AUSLAND_PARCEL_FILENAME, sqlStringAuslandParcel, AUSLAND_PARCEL_NUMBER_OF_COLUMNS);
+    QString exportDirectory = QFileDialog::getExistingDirectory(this, "Export Directory", "./", QFileDialog::Option::ShowDirsOnly);
+    exportDirectory = exportDirectory + "/";
+    WriteExportQueryOutputToCSVFile(exportDirectory + QDate::currentDate().toString(DATABASE_DATE_FORMAT) + " - " + INLAND_LETTER_FILENAME, sqlStringInlandLetter, INLAND_LETTER_NUMBER_OF_COLUMNS);
+    WriteExportQueryOutputToCSVFile(exportDirectory + QDate::currentDate().toString(DATABASE_DATE_FORMAT) + " - " + AUSLAND_LETTER_FILENAME, sqlStringAuslandLetter, AUSLAND_LETTER_NUMBER_OF_COLUMNS);
+    WriteExportQueryOutputToCSVFile(exportDirectory + QDate::currentDate().toString(DATABASE_DATE_FORMAT) + " - " + INLAND_PARCEL_FILENAME, sqlStringInlandParcel, INLAND_PARCEL_NUMBER_OF_COLUMNS);
+    WriteExportQueryOutputToCSVFile(exportDirectory + QDate::currentDate().toString(DATABASE_DATE_FORMAT) + " - " + AUSLAND_PARCEL_FILENAME, sqlStringAuslandParcel, AUSLAND_PARCEL_NUMBER_OF_COLUMNS);
     QMessageBox::information(this, "Export", "Export has been successful!", QMessageBox::Ok, QMessageBox::Ok);
 }
 
 /**
  * @brief AbonnentenSuche::WriteExportQueryOutputToCSVFile Writes the result of an SQL query to a file formatted as .csv file
- * @param fileName The name of the .csv file
+ * @param pathFileName The path including the name of the .csv file
  * @param queryString QString containing the SQL specification of the query
  * @param numberOfColumns The number of columns to extract from the query
  */
-void AbonnentenSuche::WriteExportQueryOutputToCSVFile(QString fileName, QString queryString, unsigned int numberOfColumns)
+void AbonnentenSuche::WriteExportQueryOutputToCSVFile(QString pathFileName, QString queryString, unsigned int numberOfColumns)
 {
-    QFile file(fileName, this);
+    QFile file(pathFileName, this);
     if(!file.open(QIODevice::WriteOnly | QIODevice::ReadWrite))
     {
-        qInfo() << "Could not open file" << fileName;
-        errorMan.BailOut("Error could not open" + fileName.toLocal8Bit(), __FILE__, __LINE__, FAILURE);
+        qInfo() << "Could not open file " << pathFileName;
+        errorMan.BailOut("Error could not open " + pathFileName.toLocal8Bit(), __FILE__, __LINE__, FAILURE);
         return;
     }
 
     QSqlQuery query(dbInterface->GetDatabase());
-    query.exec(queryString);
+    if(query.exec(queryString) == false)
+    {
+        qInfo() << query.lastError().text();
+        qInfo() << "queryString: " + queryString;
+        errorMan.BailOut("Error with query.exec()\nqueryString: " + queryString.toLocal8Bit() + "\n" + query.lastError().text().toLocal8Bit(), __FILE__, __LINE__, FAILURE);
+    }
+    file.write(
+    ABONNENTEN_ID_EXPORT ", "
+    ABONNENTEN_ANREDE_EXPORT ", "
+    ABONNENTEN_AMTSTITEL_EXPORT ", "
+    ABONNENTEN_TITELVOR_EXPORT ", "
+    ABONNENTEN_VORNAME_EXPORT ", "
+    ABONNENTEN_NACHNAME_EXPORT ", "
+    ABONNENTEN_TITELNACH_EXPORT ", "
+    ABONNENTEN_ORGANISATION_EXPORT ", "
+    ABONNENTEN_STRASSE_EXPORT ", "
+    ABONNENTEN_PLZALLGEMEIN_EXPORT ", "
+    ABONNENTEN_ORTALLGEMEIN_EXPORT ", "
+    ABONNENTEN_LAND_EXPORT ", "
+    ABONNENTEN_ANTONIUSANZAHL_EXPORT ", "
+    ABONNENTEN_ZUSATZINFO_EXPORT ",\r\n");
     while(query.next())
     {
         for(int z = 0; static_cast<unsigned int>(z) < numberOfColumns; z++)

@@ -34,6 +34,7 @@ void DBInterface::ConnectToDatabase(QString password)
     database.setPassword(password);
     if(database.open() == false)
     {
+        QMessageBox::critical(nullptr, "Error", "Error when opening the database", QMessageBox::StandardButton::Ok, QMessageBox::StandardButton::Ok);
         QByteArray ba = database.hostName().toLatin1();
         char buffer[BUFFER_SIZE];
         sprintf(buffer, "Error when opening the database\nHostname: %s\nPort: %u", ba.data(), database.port());
