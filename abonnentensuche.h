@@ -23,7 +23,7 @@
 
 extern ErrorManagement errorMan;
 
-#define INLAND_SUCHE_COLUMN_COUNT	14
+#define INLAND_SUCHE_COLUMN_COUNT	15
 
 #define FILTER_QLINEEDIT_Y			30
 
@@ -39,6 +39,7 @@ extern ErrorManagement errorMan;
 #define STRASSE_WIDTH				200
 #define PLZ_WIDTH					70
 #define ORT_WIDTH					120
+#define LAND_WIDTH					120
 #define ANTONIUSANZAHL_WIDTH		100
 #define ZUSATZINFO_WIDTH			80
 
@@ -103,40 +104,20 @@ public:
     explicit AbonnentenSuche(DBInterface *dbInterface, QWidget *parent);
     ~AbonnentenSuche();
 
-    void ClearTable(void);
-    void AddRow(TableRowData, bool update);
-    void AddRowTest(void);
-
 private slots:
     void FiltersChanged(const QString& text);
     void on_checkBoxSortByChangeDate_stateChanged(int arg1);
-
-    void on_tableWidget_cellClicked(int row, int column);
 
     void on_exportButton_clicked(void);
     void ExportRoutine(void);
     void WriteExportQueryOutputToCSVFile(QString fileName, QString queryString, unsigned int numberOfColumns);
 
+    void on_searchTable_clicked(const QModelIndex &index);
+
 private:
     Ui::AbonnentenSuche *ui;
     QWidget *parent;
     bool prFilterChange;
-
-    QString BuildQueryString(void);
-    void ComboboxBuildQueryString(QString& sqlString, QComboBox *comboBox, QString columnName, bool& firstWhereClause);
-    void BuildQueryStringPart(QString& sqlString, bool& firstWhereClause, QString columnName, QString filterContent, bool strictComparison);
-    void ResetFilters(void);
-    void ExecuteQueryUpdateTable(QString sqlString);
-    void UpdateLCDNum(void);
-    void RefreshComboboxModels(void);
-    void RefreshComboBoxModel(QComboBox *comboBox);
-
-    QString GetStatusName(QString statusID);
-    QString GetAnredeName(QString anredeID);
-    QString GetAmtstitelName(QString amtstitelID);
-
-    //overridden event handler
-    void keyPressEvent(QKeyEvent *event);
 
     DBInterface *dbInterface;
 
@@ -149,6 +130,7 @@ private:
     ModQLineEdit *strasseFilter;
     ModQLineEdit *PLZFilter;
     ModQLineEdit *ortFilter;
+    ModQLineEdit *landFilter;
 
     ModQComboBox *statusFilter;
     ModQComboBox *anredeFilter;
@@ -158,7 +140,26 @@ private:
     QSqlTableModel *anredeModel;
     QSqlTableModel *amtstitelModel;
 
+    QSqlQueryModel *searchTableModel;
+
     QStringList tableHeaderList;
+
+    QString BuildQueryString(void);
+    void ComboboxBuildQueryString(QString& sqlString, QComboBox *comboBox, QString columnName, bool& firstWhereClause);
+    void BuildQueryStringPart(QString& sqlString, bool& firstWhereClause, QString columnName, QString filterContent, bool strictComparison);
+    void ResetFilters(void);
+    void ExecuteQueryUpdateTable(QString sqlString);
+    void UpdateLCDNum(void);
+    void ResetTableViewSizes(void);
+    void RefreshComboboxModels(void);
+    void RefreshComboBoxModel(QComboBox *comboBox);
+
+    QString GetStatusName(QString statusID);
+    QString GetAnredeName(QString anredeID);
+    QString GetAmtstitelName(QString amtstitelID);
+
+    //overridden event handler
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // ABONNENTENINLANDSUCHE_H

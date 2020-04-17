@@ -26,6 +26,31 @@ const QString EXPORT_SQL_PREFIX("SELECT " +
         " WHERE " +
         ABONNENTEN_STATUS + " = '0' AND ");
 
+const QString SEARCH_TABLE_SQL_PREFIX("SELECT " +
+        ABONNENTEN_TABLE + "." + ABONNENTEN_ID + ", " +
+        STATUS_TABLE + "." + STATUS_STATUS + ", " +
+        ANREDE_TABLE + "." + ANREDE_ANREDE + ", " +
+        AMTSTITEL_TABLE + "." + AMTSTITEL_AMTSTITEL + ", " +
+        ABONNENTEN_TITELVOR + ", " +
+        ABONNENTEN_TITELNACH + ", " +
+        ABONNENTEN_VORNAME + ", " +
+        ABONNENTEN_NACHNAME + ", " +
+        ABONNENTEN_ORGANISATION + ", `" +
+        ABONNENTEN_STRASSE + "`, " +
+        ABONNENTEN_PLZALLGEMEIN + ", " +
+        ABONNENTEN_ORTALLGEMEIN + ", " +
+        ABONNENTEN_LAND + ", " +
+        ABONNENTEN_ANTONIUSANZAHL + ", " +
+        ABONNENTEN_ZUSATZINFO + ", " +
+        ABONNENTEN_TABLE + "." + ABONNENTEN_STATUS + ", " +
+        ABONNENTEN_TABLE + "." + ABONNENTEN_ANREDE + ", " +
+        ABONNENTEN_TABLE + "." + ABONNENTEN_AMTSTITEL +
+        " FROM " + ABONNENTEN_TABLE +
+        " LEFT JOIN " + STATUS_TABLE + " ON " + STATUS_TABLE + "." + STATUS_ID + " = " + ABONNENTEN_TABLE + "." + ABONNENTEN_STATUS +
+        " LEFT JOIN " + ANREDE_TABLE + " ON " + ANREDE_TABLE + "." + ANREDE_ID + " = " + ABONNENTEN_TABLE + "." + ABONNENTEN_ANREDE +
+        " LEFT JOIN " + AMTSTITEL_TABLE + " ON " + AMTSTITEL_TABLE + "." + AMTSTITEL_ID + " = " + ABONNENTEN_TABLE + "." + ABONNENTEN_AMTSTITEL);
+
+
 AbonnentenSuche::AbonnentenSuche(DBInterface *dbInterface, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AbonnentenSuche)
@@ -36,28 +61,30 @@ AbonnentenSuche::AbonnentenSuche(DBInterface *dbInterface, QWidget *parent) :
 
     prFilterChange = false;
     /********** set the horizontal headers for the table **********/
-    ui->tableWidget->setColumnCount(INLAND_SUCHE_COLUMN_COUNT);
 
-    ui->tableWidget->setRowCount(0);		//initially the table is empty (there are no rows)
-
-    ui->tableWidget->verticalHeader()->hide();
+    //setup and set the SQL model (with relations) of the table
+    searchTableModel = new QSqlQueryModel(this);
+    ui->searchTable->setModel(searchTableModel);
 
     //initialization of table headers
-    tableHeaderList.append(QString("ID"));
-    tableHeaderList.append(QString("Status"));
-    tableHeaderList.append(QString("Anrede"));
-    tableHeaderList.append(QString("Amtstitel"));
-    tableHeaderList.append(QString("Titel vorgestellt"));
-    tableHeaderList.append(QString("Titel nachgestellt"));
-    tableHeaderList.append(QString("Vorname"));
-    tableHeaderList.append(QString("Nachname"));
-    tableHeaderList.append(QString("Organisation"));
-    tableHeaderList.append(QString("Straße"));
-    tableHeaderList.append(QString("Plz"));
-    tableHeaderList.append(QString("Ort"));
-    tableHeaderList.append(QString("Antoniusanzahl"));
-    tableHeaderList.append(QString("Zusatzinfo"));
-    ui->tableWidget->setHorizontalHeaderLabels(tableHeaderList);
+    searchTableModel->setHeaderData(0, Qt::Horizontal, "ID");
+    searchTableModel->setHeaderData(1, Qt::Horizontal, "Status");
+    searchTableModel->setHeaderData(2, Qt::Horizontal, "Anrede");
+    searchTableModel->setHeaderData(3, Qt::Horizontal, "Amtstitel");
+    searchTableModel->setHeaderData(4, Qt::Horizontal, "Titel vorgestellt");
+    searchTableModel->setHeaderData(5, Qt::Horizontal, "Titel nachgestellt");
+    searchTableModel->setHeaderData(6, Qt::Horizontal, "Vorname");
+    searchTableModel->setHeaderData(7, Qt::Horizontal, "Nachname");
+    searchTableModel->setHeaderData(8, Qt::Horizontal, "Organisation");
+    searchTableModel->setHeaderData(9, Qt::Horizontal, "Straße");
+    searchTableModel->setHeaderData(10, Qt::Horizontal, "Plz");
+    searchTableModel->setHeaderData(11, Qt::Horizontal, "Ort");
+    searchTableModel->setHeaderData(12, Qt::Horizontal, "Land");
+    searchTableModel->setHeaderData(13, Qt::Horizontal, "Antoniusanzahl");
+    searchTableModel->setHeaderData(14, Qt::Horizontal, "Zusatzinfo");
+
+    ui->searchTable->verticalHeader()->hide();
+
 
     //set positions of the search fields (we also refer to them as "filters")
     ColumnWidthPosX colWPosX;		//this object is used to correctly position the search fields (filters) over the corresponding columns
@@ -73,23 +100,10 @@ AbonnentenSuche::AbonnentenSuche(DBInterface *dbInterface, QWidget *parent) :
     colWPosX.Append(STRASSE_WIDTH, QString("Straße"));
     colWPosX.Append(PLZ_WIDTH, QString("Plz"));
     colWPosX.Append(ORT_WIDTH, QString("Ort"));
+    colWPosX.Append(LAND_WIDTH, QString("Land"));
     colWPosX.Append(ANTONIUSANZAHL_WIDTH, QString("Antoniusanzahl"));
     colWPosX.Append(ZUSATZINFO_WIDTH, QString("Zusatzinfo"));
 
-    ui->tableWidget->setColumnWidth(0, ID_WIDTH);
-    ui->tableWidget->setColumnWidth(1, STATUS_WIDTH);
-    ui->tableWidget->setColumnWidth(2, ANREDE_WIDTH);
-    ui->tableWidget->setColumnWidth(3, AMTSTITEL_WIDTH);
-    ui->tableWidget->setColumnWidth(4, TITEL_VOR_WIDTH);
-    ui->tableWidget->setColumnWidth(5, TITEL_NACH_WIDTH);
-    ui->tableWidget->setColumnWidth(6, VORNAME_WIDTH);
-    ui->tableWidget->setColumnWidth(7, NACHNAME_WIDTH);
-    ui->tableWidget->setColumnWidth(8, ORGANISATION_WIDTH);
-    ui->tableWidget->setColumnWidth(9, STRASSE_WIDTH);
-    ui->tableWidget->setColumnWidth(10, PLZ_WIDTH);
-    ui->tableWidget->setColumnWidth(11, ORT_WIDTH);
-    ui->tableWidget->setColumnWidth(12, ANTONIUSANZAHL_WIDTH);
-    ui->tableWidget->setColumnWidth(13, ZUSATZINFO_WIDTH);
     QFont font(QString("Calibri"), DEFAULT_FONT_SIZE);
 
     // create the line edit and combobox objects (for entering the filter criteria for the table) and move them to their correct position
@@ -140,6 +154,12 @@ AbonnentenSuche::AbonnentenSuche(DBInterface *dbInterface, QWidget *parent) :
         ortFilter->setFont(font);
         ortFilter->setFixedWidth(ORT_WIDTH);
 
+        landFilter = new ModQLineEdit(this, this);
+        landFilter->move(QPoint(colWPosX.CalcPosX(QString("Land")), FILTER_QLINEEDIT_Y));
+        landFilter->setFont(font);
+        landFilter->setFixedWidth(ORT_WIDTH);
+
+
         statusFilter = new ModQComboBox(this, this);
         statusFilter->setEditable(true);
         statusFilter->setInsertPolicy(QComboBox::NoInsert);
@@ -182,8 +202,6 @@ AbonnentenSuche::AbonnentenSuche(DBInterface *dbInterface, QWidget *parent) :
         errorMan.BailOut("Thrown std::bad_alloc exception", __FILE__, __LINE__, FAILURE);
     }
 
-    ui->tableWidget->update();
-
     //connect signal with slots
     QObject::connect(this->IDFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
     QObject::connect(this->titelVorFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
@@ -194,11 +212,13 @@ AbonnentenSuche::AbonnentenSuche(DBInterface *dbInterface, QWidget *parent) :
     QObject::connect(this->strasseFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
     QObject::connect(this->PLZFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
     QObject::connect(this->ortFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
-    QObject::connect(this->statusFilter, &ModQComboBox::editTextChanged, this, &AbonnentenSuche::FiltersChanged);
-    QObject::connect(this->anredeFilter, &ModQComboBox::editTextChanged, this, &AbonnentenSuche::FiltersChanged);
-    QObject::connect(this->amtstitelFilter, &ModQComboBox::editTextChanged, this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->landFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->statusFilter, QOverload<const QString &>::of(&ModQComboBox::currentIndexChanged), this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->anredeFilter, QOverload<const QString &>::of(&ModQComboBox::currentIndexChanged), this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->amtstitelFilter, QOverload<const QString &>::of(&ModQComboBox::currentIndexChanged), this, &AbonnentenSuche::FiltersChanged);
 
     ResetFilters();
+    ResetTableViewSizes();
 }
 
 AbonnentenSuche::~AbonnentenSuche()
@@ -212,11 +232,11 @@ AbonnentenSuche::~AbonnentenSuche()
     delete strasseFilter;
     delete PLZFilter;
     delete ortFilter;
+    delete landFilter;
     delete statusFilter;
     delete anredeFilter;
     delete amtstitelFilter;
     delete ui;
-    tableHeaderList.clear();
 }
 
 /**
@@ -312,62 +332,6 @@ void AbonnentenSuche::ModQComboBox::keyPressEvent(QKeyEvent *event)
         QComboBox::keyPressEvent(event);
 }
 
-
-/**
- * @brief AbonnentenSuche::ClearTable Clears the contents of the table widget
- */
-void AbonnentenSuche::ClearTable(void)
-{
-    //ui->tableWidget->clearContents();
-    ui->tableWidget->setRowCount(0);
-    ui->tableWidget->update();
-    UpdateLCDNum();
-    return;
-}
-
-
-/**
- * @brief AbonnentenSuche::AddRow Adds a row to the table widget of this form
- * @param tableRowData Data to fill each column entry of the row with
- * @param update Whether or not the corresponding table widget should be updated to make the changes instantly visible or not (for multiple successive updates setting this to false might improve performance)
- */
-void AbonnentenSuche::AddRow(TableRowData tableRowData, bool update)
-{
-    int rowCount = ui->tableWidget->rowCount();
-
-    try
-    {
-        ui->tableWidget->insertRow(rowCount);
-
-        ui->tableWidget->setItem(rowCount, 0, new QTableWidgetItem(tableRowData.ID));
-        ui->tableWidget->setItem(rowCount, 1, new QTableWidgetItem(tableRowData.status));
-        ui->tableWidget->setItem(rowCount, 2, new QTableWidgetItem(tableRowData.anrede));
-        ui->tableWidget->setItem(rowCount, 3, new QTableWidgetItem(tableRowData.amtstitel));
-        ui->tableWidget->setItem(rowCount, 4, new QTableWidgetItem(tableRowData.titelVor));
-        ui->tableWidget->setItem(rowCount, 5, new QTableWidgetItem(tableRowData.titelNach));
-        ui->tableWidget->setItem(rowCount, 6, new QTableWidgetItem(tableRowData.vorname));
-        ui->tableWidget->setItem(rowCount, 7, new QTableWidgetItem(tableRowData.nachname));
-        ui->tableWidget->setItem(rowCount, 8, new QTableWidgetItem(tableRowData.organisation));
-        ui->tableWidget->setItem(rowCount, 9, new QTableWidgetItem(tableRowData.strasse));
-        ui->tableWidget->setItem(rowCount, 10, new QTableWidgetItem(tableRowData.plz));
-        ui->tableWidget->setItem(rowCount, 11, new QTableWidgetItem(tableRowData.ort));
-        ui->tableWidget->setItem(rowCount, 12, new QTableWidgetItem(tableRowData.antoniusanzahl));
-        ui->tableWidget->setItem(rowCount, 13, new QTableWidgetItem(tableRowData.zusatzinfo));
-    }
-    catch(std::bad_alloc exc)
-    {
-        errorMan.BailOut("Thrown std::bad_alloc exception", __FILE__, __LINE__, FAILURE);
-    }
-
-    if(update)
-    {
-        ui->tableWidget->update();
-        UpdateLCDNum();
-    }
-
-    return;
-}
-
 /**
  * @brief AbonnentenSuche::FiltersChanged Slot function that is called, whenever a filter (line edit or combobox) is changed
  * @details Also refreshes the models of the combo boxes!
@@ -393,29 +357,31 @@ void AbonnentenSuche::FiltersChanged(const QString &text)
  */
 void AbonnentenSuche::BuildQueryStringPart(QString& sqlString, bool& firstWhereClause, QString columnName, QString filterContent, bool strictComparison)
 {
-    if(firstWhereClause == true)
+    if(!filterContent.isNull() && !filterContent.isEmpty())
     {
-        sqlString.append(" WHERE");
-        firstWhereClause = false;
-    }
-    else
-        sqlString.append(" AND");
+        if(firstWhereClause == true)
+        {
+            sqlString.append(" WHERE");
+            firstWhereClause = false;
+        }
+        else
+            sqlString.append(" AND");
 
-    sqlString.append(QString(" (`"));
-    sqlString.append(columnName);
-    if(strictComparison)
-    {
-        sqlString.append(QString("` LIKE \'"));
-        sqlString.append(filterContent);
-        sqlString.append(QString("\')"));
+        sqlString.append(QString(" (") + ABONNENTEN_TABLE + ".`");
+        sqlString.append(columnName);
+        if(strictComparison)
+        {
+            sqlString.append(QString("` LIKE \'"));
+            sqlString.append(filterContent);
+            sqlString.append(QString("\')"));
+        }
+        else
+        {
+            sqlString.append(QString("` LIKE \'%"));
+            sqlString.append(filterContent);
+            sqlString.append(QString("%\')"));
+        }
     }
-    else
-    {
-        sqlString.append(QString("` LIKE \'%"));
-        sqlString.append(filterContent);
-        sqlString.append(QString("%\')"));
-    }
-    return;
 }
 
 
@@ -426,57 +392,23 @@ void AbonnentenSuche::BuildQueryStringPart(QString& sqlString, bool& firstWhereC
 QString AbonnentenSuche::BuildQueryString(void)
 {
     bool firstWhereClause = true;
-    QString sqlString("SELECT * FROM `" + ABONNENTEN_TABLE + "` ");
+    QString sqlString(SEARCH_TABLE_SQL_PREFIX);
     QString text;
 
 
-    text = IDFilter->text();
-    if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_ID, text, true);
-
-    text = titelVorFilter->text();
-    if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_TITELVOR, text, false);
-
-    text = titelNachFilter->text();
-    if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_TITELNACH, text, false);
-
-    text = vornameFilter->text();
-    if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_VORNAME, text, false);
-
-    text = nachnameFilter->text();
-    if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_NACHNAME, text, false);
-
-    text = organisationFilter->text();
-    if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_ORGANISATION, text, false);
-
-    text = strasseFilter->text();
-    if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_STRASSE, text, false);
-
-    text = PLZFilter->text();
-    if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_PLZALLGEMEIN, text, false);
-
-    text = ortFilter->text();
-    if(!text.isNull() && !text.isEmpty())
-        BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_ORTALLGEMEIN, text, false);
-
-    text = statusFilter->currentText();
-    if(!text.isNull() && !text.isEmpty())
-        ComboboxBuildQueryString(sqlString, statusFilter, ABONNENTEN_STATUS, firstWhereClause);
-
-    text = anredeFilter->currentText();
-    if(!text.isNull() && !text.isEmpty())
-        ComboboxBuildQueryString(sqlString, anredeFilter, ABONNENTEN_ANREDE, firstWhereClause);
-
-    text = amtstitelFilter->currentText();
-    if(!text.isNull() && !text.isEmpty())
-        ComboboxBuildQueryString(sqlString, amtstitelFilter, ABONNENTEN_AMTSTITEL, firstWhereClause);
+    BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_ID, IDFilter->text(), true);
+    BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_TITELVOR, titelVorFilter->text(), false);
+    BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_TITELNACH, titelNachFilter->text(), false);
+    BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_VORNAME, vornameFilter->text(), false);
+    BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_NACHNAME, nachnameFilter->text(), false);
+    BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_ORGANISATION, organisationFilter->text(), false);
+    BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_STRASSE, strasseFilter->text(), false);
+    BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_PLZALLGEMEIN, PLZFilter->text(), false);
+    BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_ORTALLGEMEIN, ortFilter->text(), false);
+    BuildQueryStringPart(sqlString, firstWhereClause, ABONNENTEN_LAND, landFilter->text(), false);
+    ComboboxBuildQueryString(sqlString, statusFilter, ABONNENTEN_STATUS, firstWhereClause);
+    ComboboxBuildQueryString(sqlString, anredeFilter, ABONNENTEN_ANREDE, firstWhereClause);
+    ComboboxBuildQueryString(sqlString, amtstitelFilter, ABONNENTEN_AMTSTITEL, firstWhereClause);
 
     //set the sort order
     if(ui->checkBoxSortByChangeDate->isChecked() == true)
@@ -499,8 +431,11 @@ QString AbonnentenSuche::BuildQueryString(void)
 void AbonnentenSuche::ComboboxBuildQueryString(QString& sqlString, QComboBox *comboBox, QString columnName, bool& firstWhereClause)
 {
 
-    QString ID = static_cast<QSqlTableModel*>(comboBox->model())->record(comboBox->currentIndex()).value(ID_POS).toString();
-    BuildQueryStringPart(sqlString, firstWhereClause, columnName, ID, true);
+    if(comboBox->currentIndex() != -1)
+    {
+        QString ID = static_cast<QSqlTableModel*>(comboBox->model())->record(comboBox->currentIndex()).value(ID_POS).toString();
+        BuildQueryStringPart(sqlString, firstWhereClause, columnName, ID, true);
+    }
     return;
 }
 
@@ -512,8 +447,7 @@ void AbonnentenSuche::ComboboxBuildQueryString(QString& sqlString, QComboBox *co
  */
 void AbonnentenSuche::on_checkBoxSortByChangeDate_stateChanged(int arg1)
 {
-    QString sqlString = BuildQueryString();
-    ExecuteQueryUpdateTable(sqlString);
+    FiltersChanged(nullptr);
 }
 
 
@@ -537,7 +471,6 @@ void AbonnentenSuche::ResetFilters(void)
 {
     bool prFilterChangeOld = prFilterChange;
     prFilterChange = true;
-    ClearTable();
     IDFilter->clear();
     titelVorFilter->clear();
     titelNachFilter->clear();
@@ -547,6 +480,7 @@ void AbonnentenSuche::ResetFilters(void)
     strasseFilter->clear();
     PLZFilter->clear();
     ortFilter->clear();
+    landFilter->clear();
 
     statusFilter->clearEditText();
     anredeFilter->clearEditText();
@@ -560,6 +494,32 @@ void AbonnentenSuche::ResetFilters(void)
     prFilterChange = prFilterChangeOld;
     FiltersChanged(nullptr);
     vornameFilter->setFocus();
+    ResetTableViewSizes();
+}
+
+/**
+ * @brief AbonnentenSuche::UpdateTableViewSizes Resets the width of the search table view
+ */
+void AbonnentenSuche::ResetTableViewSizes()
+{
+    ui->searchTable->setColumnWidth(0, ID_WIDTH);
+    ui->searchTable->setColumnWidth(1, STATUS_WIDTH);
+    ui->searchTable->setColumnWidth(2, ANREDE_WIDTH);
+    ui->searchTable->setColumnWidth(3, AMTSTITEL_WIDTH);
+    ui->searchTable->setColumnWidth(4, TITEL_VOR_WIDTH);
+    ui->searchTable->setColumnWidth(5, TITEL_NACH_WIDTH);
+    ui->searchTable->setColumnWidth(6, VORNAME_WIDTH);
+    ui->searchTable->setColumnWidth(7, NACHNAME_WIDTH);
+    ui->searchTable->setColumnWidth(8, ORGANISATION_WIDTH);
+    ui->searchTable->setColumnWidth(9, STRASSE_WIDTH);
+    ui->searchTable->setColumnWidth(10, PLZ_WIDTH);
+    ui->searchTable->setColumnWidth(11, ORT_WIDTH);
+    ui->searchTable->setColumnWidth(12, LAND_WIDTH);
+    ui->searchTable->setColumnWidth(13, ANTONIUSANZAHL_WIDTH);
+    ui->searchTable->setColumnWidth(14, ZUSATZINFO_WIDTH);
+    ui->searchTable->setColumnHidden(15, true);
+    ui->searchTable->setColumnHidden(16, true);
+    ui->searchTable->setColumnHidden(17, true);
 }
 
 /**
@@ -568,39 +528,11 @@ void AbonnentenSuche::ResetFilters(void)
  */
 void AbonnentenSuche::ExecuteQueryUpdateTable(QString sqlString)
 {
-    QSqlQuery query(dbInterface->GetDatabase());
-
-    ClearTable();
-
-    if(query.exec(sqlString) == false)
-    {
-        qInfo() << query.lastError().text();
-        qInfo() << "sqlString: " << sqlString;
-        errorMan.BailOut("Error with query.exec\nsqlString: " + sqlString.toLocal8Bit() + "\n" + query.lastError().text().toLocal8Bit(), __FILE__, __LINE__, FAILURE);
-    }
-    while(query.next())
-    {
-        TableRowData tableRowData(
-            (query.value(0) == false) ? QString("") : query.value(0).toString(),
-            (query.value(18) == false) ? QString("") : GetStatusName(query.value(18).toString()),
-            (query.value(1) == false) ? QString("") : GetAnredeName(query.value(1).toString()),
-            (query.value(4) == false) ? QString("") : GetAmtstitelName(query.value(4).toString()),
-            (query.value(2) == false) ? QString("") : query.value(2).toString(),
-            (query.value(3) == false) ? QString("") : query.value(3).toString(),
-            (query.value(6) == false) ? QString("") : query.value(6).toString(),
-            (query.value(5) == false) ? QString("") : query.value(5).toString(),
-            (query.value(7) == false) ? QString("") : query.value(7).toString(),
-            (query.value(8) == false) ? QString("") : query.value(8).toString(),
-            (query.value(12) == false) ? QString("") : query.value(12).toString(),
-            (query.value(13) == false) ? QString("") : query.value(13).toString(),
-            (query.value(14) == false) ? QString("") : query.value(14).toString(),
-            (query.value(22) == false) ? QString("") : query.value(22).toString()
-        );
-        AddRow(tableRowData, false);
-    }
-    ui->tableWidget->update();
+    searchTableModel->setQuery(sqlString);
     UpdateLCDNum();
+    ui->searchTable->show();
 }
+
 
 QString AbonnentenSuche::GetStatusName(QString statusID)
 {
@@ -617,7 +549,7 @@ QString AbonnentenSuche::GetAmtstitelName(QString amtstitelID)
 
 void AbonnentenSuche::UpdateLCDNum()
 {
-    ui->lcdNumTableRows->display(ui->tableWidget->rowCount());
+    ui->lcdNumTableRows->display(searchTableModel->rowCount());
     if(ui->lcdNumTableRows->intValue() == 0)
         ui->lcdNumTableRows->setPalette(QPalette(Qt::GlobalColor::red));
     else
@@ -626,30 +558,26 @@ void AbonnentenSuche::UpdateLCDNum()
 }
 
 /**
- * @brief AbonnentenSuche::on_tableWidget_cellClicked Slot function for when a cell on the table widget is clicked
- * @param row Row that was clicked
- * @param column Column that was clicked
+ * @brief AbonnentenSuche::on_tableView_clicked Slot function for when the table view object is clicked
+ * @param index
  */
-void AbonnentenSuche::on_tableWidget_cellClicked(int row, int column)
+void AbonnentenSuche::on_searchTable_clicked(const QModelIndex &index)
 {
-    if(column == ABONNENTEN_SUCHE_CLICK_COLUMN)
+    if(index.column() == ABONNENTEN_SUCHE_CLICK_COLUMN)
     {
-        QTableWidgetItem *tableWidgetItem = ui->tableWidget->item(row, column);
-        if(tableWidgetItem == nullptr)
-        {
-            errorMan.BailOut("Error, item() returned NULL pointer", __FILE__, __LINE__, FAILURE);
-        }
+        //get the Abonnenten widget from our parent (the QTabWidget)
         Abonnenten *abonnentenWidget = static_cast<Abonnenten*>(static_cast<QTabWidget*>(parent)->widget(ABONNENTEN_TAB));
         if(abonnentenWidget == nullptr)
         {
-            errorMan.BailOut("Error, widget() returned NULL pointer", __FILE__, __LINE__, FAILURE);
+            errorMan.BailOut("Error, parent->widget() returned NULL pointer - when trying to retrieve the Abonnenten widget from our parent QTabWidget", __FILE__, __LINE__, FAILURE);
         }
-        unsigned int selectedID = tableWidgetItem->text().toUInt();
+        unsigned int selectedID = searchTableModel->data(index).toUInt();
         abonnentenWidget->SetActiveID(selectedID);
         abonnentenWidget->LoadActiveRecord();
         static_cast<QTabWidget*>(parent)->setCurrentIndex(ABONNENTEN_TAB);
     }
 }
+
 
 /**
  * @brief AbonnentenSuche::on_exportButton_clicked Slot function for when the export button is clicked
