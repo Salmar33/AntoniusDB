@@ -804,6 +804,7 @@ bool Abonnenten::HandleComboBoxManipulationTableModel(QComboBox *comboBox, QStri
             //if the combobox's line edit is not empty and its current text is part of its content list
             else
             {
+                //check whether the text entered in the combo box equals the current entry in the database
                 QSqlQuery sqlQuery(dbInterface->GetDatabase());
                 QString sqlString("SELECT * FROM `" + comboBoxTable+ "` WHERE `" + comboBoxColumnID + "` = '" + QString::number(currentID) + "' AND `" + comboBoxColumnName + "` = '" + comboBox->currentText() + "'");
                 if(sqlQuery.exec(sqlString) == false)
@@ -811,11 +812,13 @@ bool Abonnenten::HandleComboBoxManipulationTableModel(QComboBox *comboBox, QStri
                     qInfo() << "sqlString : " << sqlString;
                     errorMan.BailOut("Error with sqlQuery.exec()\nsqlString: " + sqlString.toLocal8Bit() + "\n" + sqlQuery.lastError().text().toLocal8Bit(), __FILE__, __LINE__, FAILURE);
                 }
+               //if the currently entered text of the combo box matches the corresponding column entry in the database (for the active record) nothing needs to be done
                 if(sqlQuery.next())
                 {
                     //do nothing as the entry is already set
                     returnVal = false;
                 }
+                //if the currently entered text of the combo box does not match the corresponding column entry in the database (for the active record), then update it
                 else
                 {
                     dbInterface->UpdateRecordValue(tableMain, columnMain, static_cast<QSqlTableModel*>(comboBox->model())->record(currentTextIndex).value(ID_POS).toString(), activeID);

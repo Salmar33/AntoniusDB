@@ -43,7 +43,6 @@ extern ErrorManagement errorMan;
 #define ANTONIUSANZAHL_WIDTH		100
 #define ZUSATZINFO_WIDTH			80
 
-
 extern const QString EXPORT_SQL_PREFIX;
 
 namespace Ui {
@@ -105,14 +104,10 @@ public:
     ~AbonnentenSuche();
 
 private slots:
-    void FiltersChanged(const QString& text);
     void on_checkBoxSortByChangeDate_stateChanged(int arg1);
-
     void on_exportButton_clicked(void);
-    void ExportRoutine(void);
-    void WriteExportQueryOutputToCSVFile(QString fileName, QString queryString, unsigned int numberOfColumns);
-
     void on_searchTable_clicked(const QModelIndex &index);
+    void FiltersChanged(const QString& text);
 
 private:
     Ui::AbonnentenSuche *ui;
@@ -153,6 +148,8 @@ private:
     void ResetTableViewSizes(void);
     void RefreshComboboxModels(void);
     void RefreshComboBoxModel(QComboBox *comboBox);
+    void ExportRoutine(void);
+    void WriteExportQueryOutputToCSVFile(QString fileName, QString queryString, unsigned int numberOfColumns);
 
     QString GetStatusName(QString statusID);
     QString GetAnredeName(QString anredeID);

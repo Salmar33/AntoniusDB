@@ -213,9 +213,9 @@ AbonnentenSuche::AbonnentenSuche(DBInterface *dbInterface, QWidget *parent) :
     QObject::connect(this->PLZFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
     QObject::connect(this->ortFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
     QObject::connect(this->landFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
-    QObject::connect(this->statusFilter, QOverload<const QString &>::of(&ModQComboBox::currentIndexChanged), this, &AbonnentenSuche::FiltersChanged);
-    QObject::connect(this->anredeFilter, QOverload<const QString &>::of(&ModQComboBox::currentIndexChanged), this, &AbonnentenSuche::FiltersChanged);
-    QObject::connect(this->amtstitelFilter, QOverload<const QString &>::of(&ModQComboBox::currentIndexChanged), this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->statusFilter, &ModQComboBox::editTextChanged, this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->anredeFilter, &ModQComboBox::editTextChanged, this, &AbonnentenSuche::FiltersChanged);
+    QObject::connect(this->amtstitelFilter, &ModQComboBox::editTextChanged, this, &AbonnentenSuche::FiltersChanged);
 
     ResetFilters();
     ResetTableViewSizes();
@@ -430,10 +430,14 @@ QString AbonnentenSuche::BuildQueryString(void)
  */
 void AbonnentenSuche::ComboboxBuildQueryString(QString& sqlString, QComboBox *comboBox, QString columnName, bool& firstWhereClause)
 {
-
-    if(comboBox->currentIndex() != -1)
+    //if the current text in the combo box is part of its content table (comparison is case-insensitive)
+    int indexOfCurrentText = comboBox->findText(comboBox->currentText(), Qt::MatchFixedString);
+    if(indexOfCurrentText != -1)
     {
-        QString ID = static_cast<QSqlTableModel*>(comboBox->model())->record(comboBox->currentIndex()).value(ID_POS).toString();
+        //extract the ID of the currently set entry of the combo box
+        //note that regarding the combo box we do not use its "current index", but the index its current text would have
+        //intuitively these two should be the same, however Qt does not update combo box indices immediately or not at all, when the current text is empty ...
+        QString ID = static_cast<QSqlTableModel*>(comboBox->model())->record(indexOfCurrentText).value(ID_POS).toString();
         BuildQueryStringPart(sqlString, firstWhereClause, columnName, ID, true);
     }
     return;
@@ -623,6 +627,7 @@ void AbonnentenSuche::ExportRoutine(void)
 
 /**
  * @brief AbonnentenSuche::WriteExportQueryOutputToCSVFile Writes the result of an SQL query to a file formatted as .csv file
+ * @details The columns are separated by ";"
  * @param pathFileName The path including the name of the .csv file
  * @param queryString QString containing the SQL specification of the query
  * @param numberOfColumns The number of columns to extract from the query
@@ -644,27 +649,28 @@ void AbonnentenSuche::WriteExportQueryOutputToCSVFile(QString pathFileName, QStr
         qInfo() << "queryString: " + queryString;
         errorMan.BailOut("Error with query.exec()\nqueryString: " + queryString.toLocal8Bit() + "\n" + query.lastError().text().toLocal8Bit(), __FILE__, __LINE__, FAILURE);
     }
+    //write the horizontal header of the .csv file
     file.write(
-    ABONNENTEN_ID_EXPORT ", "
-    ABONNENTEN_ANREDE_EXPORT ", "
-    ABONNENTEN_AMTSTITEL_EXPORT ", "
-    ABONNENTEN_TITELVOR_EXPORT ", "
-    ABONNENTEN_VORNAME_EXPORT ", "
-    ABONNENTEN_NACHNAME_EXPORT ", "
-    ABONNENTEN_TITELNACH_EXPORT ", "
-    ABONNENTEN_ORGANISATION_EXPORT ", "
-    ABONNENTEN_STRASSE_EXPORT ", "
-    ABONNENTEN_PLZALLGEMEIN_EXPORT ", "
-    ABONNENTEN_ORTALLGEMEIN_EXPORT ", "
-    ABONNENTEN_LAND_EXPORT ", "
-    ABONNENTEN_ANTONIUSANZAHL_EXPORT ", "
-    ABONNENTEN_ZUSATZINFO_EXPORT ",\r\n");
+    ABONNENTEN_ID_EXPORT ";"
+    ABONNENTEN_ANREDE_EXPORT ";"
+    ABONNENTEN_AMTSTITEL_EXPORT ";"
+    ABONNENTEN_TITELVOR_EXPORT ";"
+    ABONNENTEN_VORNAME_EXPORT ";"
+    ABONNENTEN_NACHNAME_EXPORT ";"
+    ABONNENTEN_TITELNACH_EXPORT ";"
+    ABONNENTEN_ORGANISATION_EXPORT ";"
+    ABONNENTEN_STRASSE_EXPORT ";"
+    ABONNENTEN_PLZALLGEMEIN_EXPORT ";"
+    ABONNENTEN_ORTALLGEMEIN_EXPORT ";"
+    ABONNENTEN_LAND_EXPORT ";"
+    ABONNENTEN_ANTONIUSANZAHL_EXPORT ";"
+    ABONNENTEN_ZUSATZINFO_EXPORT ";\r\n");
     while(query.next())
     {
         for(int z = 0; static_cast<unsigned int>(z) < numberOfColumns; z++)
         {
-            file.write(query.value(z).toByteArray());
-            file.write(",");
+            file.write(query.value(z).toString().replace(";", ",").toUtf8());
+            file.write(";");
         }
         file.write("\r\n");
     }
