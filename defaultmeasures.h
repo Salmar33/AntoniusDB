@@ -2,6 +2,7 @@
 #define DEFAULTMEASURES_H
 
 #define DEFAULT_FONT_SIZE	12
+#define COMBOBOX_FONT_SIZE	16
 #define BUFFER_SIZE			1000
 
 #define SUCCESS				0

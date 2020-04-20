@@ -105,6 +105,7 @@ AbonnentenSuche::AbonnentenSuche(DBInterface *dbInterface, QWidget *parent) :
     colWPosX.Append(ZUSATZINFO_WIDTH, QString("Zusatzinfo"));
 
     QFont font(QString("Calibri"), DEFAULT_FONT_SIZE);
+    QFont comboBoxfont(QString("Calibri"), COMBOBOX_FONT_SIZE);
 
     // create the line edit and combobox objects (for entering the filter criteria for the table) and move them to their correct position
     try
@@ -201,6 +202,21 @@ AbonnentenSuche::AbonnentenSuche(DBInterface *dbInterface, QWidget *parent) :
     {
         errorMan.BailOut("Thrown std::bad_alloc exception", __FILE__, __LINE__, FAILURE);
     }
+
+    //set tab order
+    this->setTabOrder(IDFilter, statusFilter);
+    this->setTabOrder(statusFilter, anredeFilter);
+    this->setTabOrder(anredeFilter, amtstitelFilter);
+    this->setTabOrder(amtstitelFilter, titelVorFilter);
+    this->setTabOrder(titelVorFilter, titelNachFilter);
+    this->setTabOrder(titelNachFilter, vornameFilter);
+    this->setTabOrder(vornameFilter, nachnameFilter);
+    this->setTabOrder(nachnameFilter, organisationFilter);
+    this->setTabOrder(organisationFilter, strasseFilter);
+    this->setTabOrder(strasseFilter, PLZFilter);
+    this->setTabOrder(PLZFilter, ortFilter);
+    this->setTabOrder(ortFilter, landFilter);
+    //this->setTabOrder(landFilter, IDFilter);	//apparently circular tab ordering does not work in Qt! - this results in weird behavior
 
     //connect signal with slots
     QObject::connect(this->IDFilter, &ModQLineEdit::textEdited, this, &AbonnentenSuche::FiltersChanged);
