@@ -644,6 +644,7 @@ void AbonnentenSuche::ExportRoutine(void)
 /**
  * @brief AbonnentenSuche::WriteExportQueryOutputToCSVFile Writes the result of an SQL query to a file formatted as .csv file
  * @details The columns are separated by ";"
+ * 			Hence it replaces all ";" by "," and all "\n" and "\r" by " "
  * @param pathFileName The path including the name of the .csv file
  * @param queryString QString containing the SQL specification of the query
  * @param numberOfColumns The number of columns to extract from the query
@@ -681,11 +682,14 @@ void AbonnentenSuche::WriteExportQueryOutputToCSVFile(QString pathFileName, QStr
     ABONNENTEN_LAND_EXPORT ";"
     ABONNENTEN_ANTONIUSANZAHL_EXPORT ";"
     ABONNENTEN_ZUSATZINFO_EXPORT ";\r\n");
+    QString exportString;
     while(query.next())
     {
         for(int z = 0; static_cast<unsigned int>(z) < numberOfColumns; z++)
         {
-            file.write(query.value(z).toString().replace(";", ",").toUtf8());
+            //replace ";" by "," and "\n" and "\r" by " " (each)
+            exportString = query.value(z).toString().replace(";", ",").replace("\n", " "). replace("\r", " ");
+            file.write(exportString.toUtf8());
             file.write(";");
         }
         file.write("\r\n");

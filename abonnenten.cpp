@@ -452,7 +452,6 @@ void Abonnenten::on_lineEditTitelVor_textEdited(const QString &arg1)
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_TITELVOR, arg1, activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -466,7 +465,6 @@ void Abonnenten::on_lineEditTitelNach_textEdited(const QString &arg1)
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_TITELNACH, arg1, activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -480,7 +478,6 @@ void Abonnenten::on_lineEditVorname_textEdited(const QString &arg1)
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_VORNAME, arg1, activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -494,7 +491,6 @@ void Abonnenten::on_lineEditNachname_textEdited(const QString &arg1)
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_NACHNAME, arg1, activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -508,7 +504,6 @@ void Abonnenten::on_lineEditOrganisation_textEdited(const QString &arg1)
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_ORGANISATION, arg1, activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -522,7 +517,6 @@ void Abonnenten::on_lineEditStrasse_textEdited(const QString &arg1)
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_STRASSE, arg1, activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -536,7 +530,6 @@ void Abonnenten::on_lineEditLand_textEdited(const QString &arg1)
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_LAND, arg1, activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -550,7 +543,6 @@ void Abonnenten::on_lineEditPLZ_textEdited(const QString &arg1)
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_PLZALLGEMEIN, arg1, activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -564,7 +556,6 @@ void Abonnenten::on_lineEditOrt_textEdited(const QString &arg1)
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_ORTALLGEMEIN, arg1, activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -578,7 +569,6 @@ void Abonnenten::on_lineEditMietcode_textEdited(const QString &arg1)
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_MIETCODE, arg1, activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -592,7 +582,6 @@ void Abonnenten::on_lineEditZusatzinfo_textEdited(const QString &arg1)
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_ZUSATZINFO, arg1, activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -606,7 +595,6 @@ void Abonnenten::on_lineEditTelNr_textEdited(const QString &arg1)
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_TELNR, arg1, activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -633,7 +621,6 @@ void Abonnenten::on_lineEditEmail_textEdited(const QString &arg1)
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_EMAIL, arg1, activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -647,7 +634,6 @@ void Abonnenten::on_lineEditBeruf_textEdited(const QString &arg1)
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_BERUFTAETIGKEIT, arg1, activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -660,7 +646,6 @@ void Abonnenten::on_txtEditAnmerkungen_textChanged()
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_ANMERKUNGEN, ui->txtEditAnmerkungen->toPlainText(), activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -678,7 +663,6 @@ void Abonnenten::on_checkDankschreiben_clicked(bool checked)
             dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_DANKSCHREIBEN, QString::number(0), activeID);
 
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -691,7 +675,6 @@ void Abonnenten::on_spinAntoniusAnzahl_editingFinished()
     {
         dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_ANTONIUSANZAHL, QString::number(ui->spinAntoniusAnzahl->value()), activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 
@@ -712,7 +695,6 @@ void Abonnenten::on_dateErstelltAm_dateTimeChanged(const QDateTime &dateTime)
         else
             dbInterface->UpdateRecordValue(ABONNENTEN_TABLE, ABONNENTEN_ERSTELLTAM, newStrValue, activeID);
         SetUpdateDateTimeLastChangeToCurrentDateTime();
-        LoadActiveRecord();
     }
 }
 

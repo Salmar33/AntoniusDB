@@ -94,6 +94,8 @@
    </property>
    <property name="font">
     <font>
+     <family>Calibri</family>
+     <pointsize>12</pointsize>
      <kerning>true</kerning>
     </font>
    </property>
@@ -999,6 +1001,12 @@ hinzufügen</string>
    </property>
    <property name="insertPolicy">
     <enum>QComboBox::NoInsert</enum>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>20</width>
+     <height>20</height>
+    </size>
    </property>
   </widget>
   <widget class="QTableView" name="tableBuchungen">
