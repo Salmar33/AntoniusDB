@@ -40,7 +40,7 @@ extern ErrorManagement errorMan;
 #define PLZ_WIDTH					70
 #define ORT_WIDTH					120
 #define LAND_WIDTH					120
-#define ANTONIUSANZAHL_WIDTH		100
+#define ANTONIUSANZAHL_WIDTH		80
 #define ZUSATZINFO_WIDTH			80
 
 extern const QString EXPORT_SQL_PREFIX;
@@ -102,6 +102,8 @@ public:
 
     explicit AbonnentenSuche(DBInterface *dbInterface, QWidget *parent);
     ~AbonnentenSuche();
+
+    bool HandleKeyEvents(QKeyEvent *event);
 
 private slots:
     void on_checkBoxSortByChangeDate_stateChanged(int arg1);

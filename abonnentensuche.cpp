@@ -41,7 +41,7 @@ const QString SEARCH_TABLE_SQL_PREFIX("SELECT " +
         ABONNENTEN_ORTALLGEMEIN + ", " +
         ABONNENTEN_LAND + ", " +
         ABONNENTEN_ANTONIUSANZAHL + ", " +
-        ABONNENTEN_ZUSATZINFO + ", " +
+        //ABONNENTEN_ZUSATZINFO + ", " +
         ABONNENTEN_TABLE + "." + ABONNENTEN_STATUS + ", " +
         ABONNENTEN_TABLE + "." + ABONNENTEN_ANREDE + ", " +
         ABONNENTEN_TABLE + "." + ABONNENTEN_AMTSTITEL +
@@ -63,25 +63,13 @@ AbonnentenSuche::AbonnentenSuche(DBInterface *dbInterface, QWidget *parent) :
     /********** set the horizontal headers for the table **********/
 
     //setup and set the SQL model (with relations) of the table
-    searchTableModel = new QSqlQueryModel(this);
-    ui->searchTable->setModel(searchTableModel);
+    try{ searchTableModel = new QSqlQueryModel(this); }
+    catch(std::bad_alloc exc)
+    {
+        errorMan.BailOut("Error, std::bad_alloc exception", __FILE__, __LINE__, FAILURE);
+    }
 
-    //initialization of table headers
-    searchTableModel->setHeaderData(0, Qt::Horizontal, "ID");
-    searchTableModel->setHeaderData(1, Qt::Horizontal, "Status");
-    searchTableModel->setHeaderData(2, Qt::Horizontal, "Anrede");
-    searchTableModel->setHeaderData(3, Qt::Horizontal, "Amtstitel");
-    searchTableModel->setHeaderData(4, Qt::Horizontal, "Titel vorgestellt");
-    searchTableModel->setHeaderData(5, Qt::Horizontal, "Titel nachgestellt");
-    searchTableModel->setHeaderData(6, Qt::Horizontal, "Vorname");
-    searchTableModel->setHeaderData(7, Qt::Horizontal, "Nachname");
-    searchTableModel->setHeaderData(8, Qt::Horizontal, "Organisation");
-    searchTableModel->setHeaderData(9, Qt::Horizontal, "Straße");
-    searchTableModel->setHeaderData(10, Qt::Horizontal, "Plz");
-    searchTableModel->setHeaderData(11, Qt::Horizontal, "Ort");
-    searchTableModel->setHeaderData(12, Qt::Horizontal, "Land");
-    searchTableModel->setHeaderData(13, Qt::Horizontal, "Antoniusanzahl");
-    searchTableModel->setHeaderData(14, Qt::Horizontal, "Zusatzinfo");
+    ui->searchTable->setModel(searchTableModel);
 
     ui->searchTable->verticalHeader()->hide();
 
@@ -102,7 +90,7 @@ AbonnentenSuche::AbonnentenSuche(DBInterface *dbInterface, QWidget *parent) :
     colWPosX.Append(ORT_WIDTH, QString("Ort"));
     colWPosX.Append(LAND_WIDTH, QString("Land"));
     colWPosX.Append(ANTONIUSANZAHL_WIDTH, QString("Antoniusanzahl"));
-    colWPosX.Append(ZUSATZINFO_WIDTH, QString("Zusatzinfo"));
+    //colWPosX.Append(ZUSATZINFO_WIDTH, QString("Zusatzinfo"));
 
     QFont font(QString("Calibri"), DEFAULT_FONT_SIZE);
     QFont comboBoxfont(QString("Calibri"), COMBOBOX_FONT_SIZE);
@@ -234,7 +222,6 @@ AbonnentenSuche::AbonnentenSuche(DBInterface *dbInterface, QWidget *parent) :
     QObject::connect(this->amtstitelFilter, &ModQComboBox::editTextChanged, this, &AbonnentenSuche::FiltersChanged);
 
     ResetFilters();
-    ResetTableViewSizes();
 }
 
 AbonnentenSuche::~AbonnentenSuche()
@@ -321,10 +308,7 @@ AbonnentenSuche::ModQLineEdit::~ModQLineEdit() {}
 
 void AbonnentenSuche::ModQLineEdit::keyPressEvent(QKeyEvent *event)
 {
-    if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Backspace)
-        outerClassInstance->ResetFilters();
-    //all other events are processed by the base class's event handler
-    else
+    if(outerClassInstance->HandleKeyEvents(event))
         QLineEdit::keyPressEvent(event);
 }
 
@@ -341,10 +325,7 @@ AbonnentenSuche::ModQComboBox::~ModQComboBox() {}
 
 void AbonnentenSuche::ModQComboBox::keyPressEvent(QKeyEvent *event)
 {
-    if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Backspace)
-        outerClassInstance->ResetFilters();
-    //all other events are processed by the base class's event handler
-    else
+    if(outerClassInstance->HandleKeyEvents(event))
         QComboBox::keyPressEvent(event);
 }
 
@@ -477,11 +458,27 @@ void AbonnentenSuche::on_checkBoxSortByChangeDate_stateChanged(int arg1)
  */
 void AbonnentenSuche::keyPressEvent(QKeyEvent *event)
 {
+    if(HandleKeyEvents(event))
+        QWidget::keyPressEvent(event);
+}
+
+/**
+ * @brief HandleKeyEvents To be called inside the different keyPressEvent handlers
+ * @param event key event to handle
+ * @returns True if the event still needs to be handled or false otherwise
+ */
+bool AbonnentenSuche::HandleKeyEvents(QKeyEvent *event)
+{
+    bool returnValue = false;
     if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Backspace)
         ResetFilters();
     //all other events are processed by the base class's event handler
+    if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_I)
+        IDFilter->setFocus();
     else
-        QWidget::keyPressEvent(event);
+        returnValue = true;
+
+    return returnValue;
 }
 
 /**
@@ -518,7 +515,7 @@ void AbonnentenSuche::ResetFilters(void)
 }
 
 /**
- * @brief AbonnentenSuche::UpdateTableViewSizes Resets the width of the search table view
+ * @brief AbonnentenSuche::UpdateTableViewSizes Resets the width of the search table view and (re)sets the table headers
  */
 void AbonnentenSuche::ResetTableViewSizes()
 {
@@ -536,10 +533,25 @@ void AbonnentenSuche::ResetTableViewSizes()
     ui->searchTable->setColumnWidth(11, ORT_WIDTH);
     ui->searchTable->setColumnWidth(12, LAND_WIDTH);
     ui->searchTable->setColumnWidth(13, ANTONIUSANZAHL_WIDTH);
-    ui->searchTable->setColumnWidth(14, ZUSATZINFO_WIDTH);
+    ui->searchTable->setColumnHidden(14, true);
     ui->searchTable->setColumnHidden(15, true);
     ui->searchTable->setColumnHidden(16, true);
-    ui->searchTable->setColumnHidden(17, true);
+
+    //(re)set table headers (the QSqlQueryModel resets the headers to the column names)
+    searchTableModel->setHeaderData(0, Qt::Horizontal, "ID");
+    searchTableModel->setHeaderData(1, Qt::Horizontal, "Status");
+    searchTableModel->setHeaderData(2, Qt::Horizontal, "Anrede");
+    searchTableModel->setHeaderData(3, Qt::Horizontal, "Amtstitel");
+    searchTableModel->setHeaderData(4, Qt::Horizontal, "Titel vorgestellt");
+    searchTableModel->setHeaderData(5, Qt::Horizontal, "Titel nachgestellt");
+    searchTableModel->setHeaderData(6, Qt::Horizontal, "Vorname");
+    searchTableModel->setHeaderData(7, Qt::Horizontal, "Nachname");
+    searchTableModel->setHeaderData(8, Qt::Horizontal, "Organisation");
+    searchTableModel->setHeaderData(9, Qt::Horizontal, "Straße");
+    searchTableModel->setHeaderData(10, Qt::Horizontal, "Plz");
+    searchTableModel->setHeaderData(11, Qt::Horizontal, "Ort");
+    searchTableModel->setHeaderData(12, Qt::Horizontal, "Land");
+    searchTableModel->setHeaderData(13, Qt::Horizontal, "Antoniusanzahl");
 }
 
 /**
