@@ -27,6 +27,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
 	buchunghinzu.cpp \
+	currencydelegate.cpp \
         main.cpp \
     antoniusdbguitab.cpp \
     dbinterface.cpp \
@@ -39,6 +40,7 @@ SOURCES += \
 HEADERS += \
     antoniusdbguitab.h \
     buchunghinzu.h \
+    currencydelegate.h \
     dbinterface.h \
     ErrorManagement/ErrorManagement.h \
     columnwidthposx.h \

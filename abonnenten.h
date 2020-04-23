@@ -14,6 +14,7 @@
 #include "defaultmeasures.h"
 #include "dbinterface.h"
 #include "buchunghinzu.h"
+#include "currencydelegate.h"
 
 extern ErrorManagement errorMan;
 
@@ -44,8 +45,10 @@ private:
     QSqlRelationalTableModel *ortModel;
     QSqlTableModel *plzModel;
     QSqlTableModel *statusModel;
-
     QSqlTableModel *buchungenModel;
+
+    CurrencyDelegate currencyDelegate;		//for proper display of currency in the "Betrag" column of the Buchungen table
+
 
     void SetUpdateDateTimeLastChangeToCurrentDateTime(void);
     void SetUpdateDateTimeForStatusChangeToCurrentDateTime(void);

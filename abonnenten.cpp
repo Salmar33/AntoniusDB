@@ -91,6 +91,7 @@ Abonnenten::Abonnenten(DBInterface *dbInterface, QWidget *parent) :
     ui->comboStatus->installEventFilter(this);
     ui->dateStatusGesetzt->installEventFilter(this);
 
+    ui->tableBuchungen->setItemDelegateForColumn(BUCHUNGEN_BETRAG_POS, &currencyDelegate);
 
     LoadActiveRecord();
 }
