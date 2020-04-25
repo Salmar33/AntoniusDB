@@ -39,7 +39,7 @@ void AntoniusDBGUITab::keyPressEvent(QKeyEvent *event)
     switch(keyCode)
     {
     case Qt::Key_Escape:
-        this->ExitProgram();
+        //this->ExitProgram();
         break;
 
     case Qt::Key_F1:

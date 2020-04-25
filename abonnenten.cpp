@@ -2,6 +2,7 @@
 #include "ui_abonnenten.h"
 #include <QKeyEvent>
 
+
 Abonnenten::Abonnenten(DBInterface *dbInterface, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Abonnenten)
