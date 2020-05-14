@@ -104,12 +104,16 @@ public:
     ~AbonnentenSuche();
 
     bool HandleKeyEvents(QKeyEvent *event);
+    void BackupRoutine(void);
+    void BackupTable(QString tableName, QString filePath, QString fileName);
 
 private slots:
     void on_checkBoxSortByChangeDate_stateChanged(int arg1);
     void on_exportButton_clicked(void);
     void on_searchTable_clicked(const QModelIndex &index);
     void FiltersChanged(const QString& text);
+
+    void on_backupButton_clicked();
 
 private:
     Ui::AbonnentenSuche *ui;

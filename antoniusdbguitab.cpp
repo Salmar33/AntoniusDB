@@ -1,6 +1,7 @@
 #include "antoniusdbguitab.h"
 #include "ui_antoniusdbguitab.h"
 #include <QKeyEvent>
+#include <QIcon>
 
 /********** include files for all the page widgets **********/
 #include "abonnenten.h"
@@ -12,6 +13,9 @@ AntoniusDBGUITab::AntoniusDBGUITab(DBInterface *dbInterface, QWidget *parent) :
     ui(new Ui::AntoniusDBGUITab)
 {
     ui->setupUi(this);
+    this->setWindowTitle(APPLICATION_WINDOW_TITLE);
+    windowIcon = QIcon("./resource/Antonius Icon big.jpg");
+    this->setWindowIcon(windowIcon);
     this->addTab(new Abonnenten(dbInterface, this), QString("Abonnenten (F3)"));
     this->addTab(new AbonnentenSuche(dbInterface, this), QString("Abonnenten Suche (F4)"));
 }

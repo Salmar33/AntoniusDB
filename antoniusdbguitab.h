@@ -4,6 +4,9 @@
 #include <QTabWidget>
 #include "dbinterface.h"
 
+
+#define APPLICATION_WINDOW_TITLE	"AntoniusDB"
+
 namespace Ui {
 class AntoniusDBGUITab;
 }
@@ -27,6 +30,7 @@ private slots:
 
 private:
     Ui::AntoniusDBGUITab *ui;
+    QIcon windowIcon;
 };
 
 #endif // ANTONIUSDBGUITAB_H

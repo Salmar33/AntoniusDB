@@ -1,6 +1,8 @@
 #include "abonnentensuche.h"
 #include "ui_abonnentensuche.h"
 #include "columnwidthposx.h"
+#include <QInputDialog>
+#include <cstdlib>
 
 //for testing only
 #include <QThread>
@@ -668,7 +670,6 @@ void AbonnentenSuche::WriteExportQueryOutputToCSVFile(QString pathFileName, QStr
     {
         qInfo() << "Could not open file " << pathFileName;
         errorMan.BailOut("Error could not open " + pathFileName.toLocal8Bit(), __FILE__, __LINE__, FAILURE);
-        return;
     }
 
     QSqlQuery query(dbInterface->GetDatabase());
@@ -700,7 +701,7 @@ void AbonnentenSuche::WriteExportQueryOutputToCSVFile(QString pathFileName, QStr
         for(int z = 0; static_cast<unsigned int>(z) < numberOfColumns; z++)
         {
             //replace ";" by "," and "\n" and "\r" by " " (each)
-            exportString = query.value(z).toString().replace(";", ",").replace("\n", " "). replace("\r", " ");
+            exportString = query.value(z).toString().replace(";", ",").replace("\n", " ").replace("\r", " ");
             file.write(exportString.toUtf8());
             file.write(";");
         }
@@ -709,6 +710,26 @@ void AbonnentenSuche::WriteExportQueryOutputToCSVFile(QString pathFileName, QStr
     file.flush();
     file.close();
 }
+
+/**
+ * @brief AbonnentenSuche::on_backupButton_clicked Slot function for when the backup button is clicked
+ */
+void AbonnentenSuche::on_backupButton_clicked()
+{
+    BackupRoutine();
+}
+
+/**
+ * @brief BackupRoutine Creates a backup of all tables of the database in a directory selected by the user
+ * @details The exported files from this backup are in .csv format
+ */
+void AbonnentenSuche::BackupRoutine(void)
+{
+    QString backupDirectoryFile = QFileDialog::getSaveFileName(this, "Backup Directory", "./antonius_backup.sql", "SQL files (*.sql)");
+    QString password = QInputDialog::getText(nullptr, "Password", "Please enter the password", QLineEdit::Password, "Please enter the password");
+    std::system("mysqldump -u Sal -p" + password.toLocal8Bit() + " antonius > \"" + backupDirectoryFile.toLocal8Bit());
+}
+
 
 
 /**
