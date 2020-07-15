@@ -681,7 +681,7 @@ void AbonnentenSuche::WriteExportQueryOutputToCSVFile(QString pathFileName, QStr
     }
     //write the horizontal header of the .csv file
     file.write(
-    ABONNENTEN_ID_EXPORT ";"
+    ABONNENTEN_ZAHLUNGSREFERENZ_EXPORT ";"
     ABONNENTEN_ANREDE_EXPORT ";"
     ABONNENTEN_AMTSTITEL_EXPORT ";"
     ABONNENTEN_TITELVOR_EXPORT ";"
@@ -700,8 +700,12 @@ void AbonnentenSuche::WriteExportQueryOutputToCSVFile(QString pathFileName, QStr
     {
         for(int z = 0; static_cast<unsigned int>(z) < numberOfColumns; z++)
         {
-            //replace ";" by "," and "\n" and "\r" by " " (each)
-            exportString = query.value(z).toString().replace(";", ",").replace("\n", " ").replace("\r", " ");
+            //print a "Zahlungsreferenz" instead of the pure ID, which is ID+ZAHLUNGSREFERENCE_OFFSET
+            if(z == 0)
+                exportString = QString::number(query.value(z).toLongLong() + ZAHLUNGSREFERENCE_OFFSET);
+            else
+                //replace ";" by "," and "\n" and "\r" by " " (each)
+                exportString = query.value(z).toString().replace(";", ",").replace("\n", " ").replace("\r", " ");
             file.write(exportString.toUtf8());
             file.write(";");
         }

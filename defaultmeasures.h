@@ -5,6 +5,8 @@
 #define COMBOBOX_FONT_SIZE	16
 #define BUFFER_SIZE			1000
 
+#define ZAHLUNGSREFERENCE_OFFSET	100010000000
+
 #define SUCCESS				0
 #define FAILURE				1
 
@@ -202,6 +204,7 @@
 /**********************************************************************/
 //column names in the export .csv files
 #define ABONNENTEN_ID_EXPORT				"ID"
+#define ABONNENTEN_ZAHLUNGSREFERENZ_EXPORT	"Zahlungsreferenz" //this is ID+100010000000
 #define ABONNENTEN_ANREDE_EXPORT			"Anrede"
 #define ABONNENTEN_AMTSTITEL_EXPORT			"Amtstitel"
 #define ABONNENTEN_TITELVOR_EXPORT			"Titel vorgestellt"
