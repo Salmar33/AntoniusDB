@@ -25,8 +25,8 @@ const QString EXPORT_SQL_PREFIX("SELECT " +
         " FROM " + ABONNENTEN_TABLE +
         " LEFT JOIN " + ANREDE_TABLE + " ON " + ANREDE_TABLE + "." + ANREDE_ID + " = " + ABONNENTEN_TABLE + "." + ABONNENTEN_ANREDE +
         " LEFT JOIN " + AMTSTITEL_TABLE + " ON " + AMTSTITEL_TABLE + "." + AMTSTITEL_ID + " = " + ABONNENTEN_TABLE + "." + ABONNENTEN_AMTSTITEL +
-        " WHERE " +
-        ABONNENTEN_STATUS + " = '0' AND ");
+        " WHERE (" +
+        ABONNENTEN_STATUS + " = '0' OR " + ABONNENTEN_STATUS + " IS NULL) AND ");
 
 const QString SEARCH_TABLE_SQL_PREFIX("SELECT " +
         ABONNENTEN_TABLE + "." + ABONNENTEN_ID + ", " +

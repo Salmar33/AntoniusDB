@@ -315,14 +315,16 @@ void Abonnenten::on_pushButtonNewRecord_clicked()
 {
     QMessageBox::StandardButton messageBoxButton;
     QSqlQuery sqlQuery;
-    QString queryString("INSERT INTO `" + ABONNENTEN_TABLE + "` (`erstelltAm`, `Land`, `letzteÄnderung`, `Dankschreiben`, `Antoniusanzahl`, `StatusGesetztAm`, `Anmerkungen`) " +
+    QString queryString("INSERT INTO `" + ABONNENTEN_TABLE + "` (`" + ABONNENTEN_ERSTELLTAM + "`, `" + ABONNENTEN_LAND + "`, `" + ABONNENTEN_LETZTEAENDERUNG + "`, `" + ABONNENTEN_DANKSCHREIBEN +
+"`, `" + ABONNENTEN_ANTONIUSANZAHL + "`, `" + ABONNENTEN_STATUSGESETZTAM + "`, `" + ABONNENTEN_STATUS + "`, `" + ABONNENTEN_ANMERKUNGEN + "`) " +
         "VALUES ( '" +
             QDateTime::currentDateTime().toString(DATABASE_DATETIME_FORMAT) + "' ," +
             QString("'A'") + ", '" +
             QDateTime::currentDateTime().toString(DATABASE_DATETIME_FORMAT) + "' ," +
             QString::number(0) + "," +
             QString::number(1) + "," +
-            "'0001-01-01'" + ", '" +
+            "'0001-01-01'" + ", " +
+            QString::number(0) + ", '" +
             QDate::currentDate().toString(QString(ANMERKUNGEN_DATE_FORMAT)) + QString(" hinzugefügt laut '")
         + ")");
 

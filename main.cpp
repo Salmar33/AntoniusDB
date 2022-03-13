@@ -11,7 +11,6 @@ ErrorManagement errorMan;
 
 int main(int argc, char *argv[])
 {
-    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);	//enables proper scaling for high DPI screens
     QApplication a(argc, argv);		//does resource management ...
 
     DBInterface *dbInterface = new DBInterface();

@@ -43,6 +43,7 @@ extern ErrorManagement errorMan;
 #define ANTONIUSANZAHL_WIDTH		80
 #define ZUSATZINFO_WIDTH			80
 
+extern const QString SEARCH_TABLE_SQL_PREFIX;
 extern const QString EXPORT_SQL_PREFIX;
 
 namespace Ui {

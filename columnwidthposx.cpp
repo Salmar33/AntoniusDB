@@ -6,7 +6,7 @@ ColumnWidthPosX::ColumnStr::ColumnStr(unsigned int width, QString columnName)
     this->columnName = columnName;
 }
 
-bool ColumnWidthPosX::ColumnStr::operator==(struct ColumnWidthPosX::ColumnStr columnStr)
+bool ColumnWidthPosX::ColumnStr::operator==(struct ColumnWidthPosX::ColumnStr columnStr) const
 {
     return (this->width == columnStr.width) && (QString::compare(this->columnName, columnStr.columnName) == 0);
 }

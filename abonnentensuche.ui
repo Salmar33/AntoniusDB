@@ -33,6 +33,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Calibri</family>
      <pointsize>11</pointsize>
     </font>
    </property>
@@ -493,6 +494,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Calibri</family>
      <pointsize>14</pointsize>
      <weight>50</weight>
      <bold>false</bold>

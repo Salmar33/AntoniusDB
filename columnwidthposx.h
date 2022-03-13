@@ -15,7 +15,7 @@ public:
     struct ColumnStr
     {
         ColumnStr(unsigned int, QString);
-        bool operator==(ColumnWidthPosX::ColumnStr);
+        bool operator==(ColumnWidthPosX::ColumnStr) const;
 
         unsigned int width; QString columnName;
     };
